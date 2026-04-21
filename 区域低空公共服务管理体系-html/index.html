@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>axhub-make - 原型预览</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      min-height: 100vh;
+    }
+    .header {
+      background: #fff;
+      border-bottom: 1px solid #e8e8e8;
+      padding: 24px 32px;
+    }
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    .header h1 span { color: #1677ff; }
+    .header p {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #999;
+    }
+    .content {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e8e8e8;
+    }
+    .section { margin-bottom: 32px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .item-card {
+      display: block;
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 8px;
+      padding: 20px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s;
+    }
+    .item-card:hover {
+      border-color: #1677ff;
+      box-shadow: 0 2px 8px rgba(22, 119, 255, 0.1);
+      transform: translateY(-2px);
+    }
+    .item-name {
+      font-size: 15px;
+      font-weight: 500;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+    }
+    .item-path {
+      font-size: 12px;
+      color: #999;
+      font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+    }
+    .empty {
+      color: #ccc;
+      font-size: 14px;
+      padding: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>axhub-make <span>原型预览</span></h1>
+    <p>共 5 个页面 · 由 Axhub Make 导出</p>
+  </div>
+  <div class="content">
+    <div class="section">
+      <div class="section-title">页面（4）</div>
+      <div class="grid">
+        <a href="prototypes/emergency-service.html" class="item-card">
+          <div class="item-name">低空应急服务</div>
+          <div class="item-path">prototypes/emergency-service</div>
+        </a>
+        <a href="prototypes/flight-service.html" class="item-card">
+          <div class="item-name">低空飞行服务</div>
+          <div class="item-path">prototypes/flight-service</div>
+        </a>
+        <a href="prototypes/home.html" class="item-card">
+          <div class="item-name">区域低空公共服务门户首页</div>
+          <div class="item-path">prototypes/home</div>
+        </a>
+        <a href="prototypes/info-service.html" class="item-card">
+          <div class="item-name">低空信息服务</div>
+          <div class="item-path">prototypes/info-service</div>
+        </a>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">组件（1）</div>
+      <div class="grid">
+        <a href="components/side-menu.html" class="item-card">
+          <div class="item-name">侧边菜单</div>
+          <div class="item-path">components/side-menu</div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
