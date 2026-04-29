@@ -7,7 +7,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # Build outputs
-dist/
+# dist/ - 注释掉以便 GitHub Pages 部署
 tests/
 vite-plugins/**/*.test.ts
 !vite-plugins/jagat-ui-clone-conversion.test.ts
