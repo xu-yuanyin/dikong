@@ -103,17 +103,23 @@ if (fs.existsSync(srcBootstrap)) {
   }
   fs.copyFileSync(srcBootstrap, destBootstrap);
   console.log('✓ html-template-bootstrap.js 已复制到 dist/assets');
-  
-  // 同时复制其他必要的依赖（如果有的话）
-  const assetsFiles = fs.readdirSync(path.join(adminDir, 'assets'));
-  for (const file of assetsFiles) {
-    // 复制 bootstrap 依赖的 chunk 文件
-    if (file.startsWith('index-') && file.endsWith('.js')) {
-      const src = path.join(adminDir, 'assets', file);
-      const dest = path.join(destAssetsDir, file);
-      fs.copyFileSync(src, dest);
-      console.log(`✓ ${file} 已复制到 dist/assets`);
+
+  // 复制 chunks 目录（包含 vendor-react.js 等依赖）
+  const srcChunksDir = path.join(adminDir, 'assets/chunks');
+  const destChunksDir = path.join(destAssetsDir, 'chunks');
+
+  if (fs.existsSync(srcChunksDir)) {
+    if (!fs.existsSync(destChunksDir)) {
+      fs.mkdirSync(destChunksDir, { recursive: true });
     }
+
+    const chunkFiles = fs.readdirSync(srcChunksDir);
+    for (const file of chunkFiles) {
+      const src = path.join(srcChunksDir, file);
+      const dest = path.join(destChunksDir, file);
+      fs.copyFileSync(src, dest);
+    }
+    console.log(`✓ chunks 目录已复制到 dist/assets (${chunkFiles.length} 个文件)`);
   }
 } else {
   console.warn('⚠ html-template-bootstrap.js 不存在，请先构建 prototype-admin');
