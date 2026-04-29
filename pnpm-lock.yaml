@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@tailwindcss/oxide-win32-x64-msvc':
+        specifier: ^4.2.4
+        version: 4.2.4
       archiver:
         specifier: ^7.0.1
         version: 7.0.1
@@ -3773,8 +3776,7 @@ snapshots:
   '@tailwindcss/oxide-win32-arm64-msvc@4.2.4':
     optional: true
 
-  '@tailwindcss/oxide-win32-x64-msvc@4.2.4':
-    optional: true
+  '@tailwindcss/oxide-win32-x64-msvc@4.2.4': {}
 
   '@tailwindcss/oxide@4.2.4':
     optionalDependencies:
