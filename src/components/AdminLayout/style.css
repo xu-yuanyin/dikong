@@ -1,0 +1,31 @@
+.admin-layout-sider {
+  box-shadow: 2px 0 8px 0 rgba(29,35,41,0.05);
+  z-index: 10;
+}
+.admin-layout-sider .ant-menu-item-selected {
+  background-color: #e6f4ff !important;
+  color: #1677ff !important;
+  font-weight: 500;
+}
+.admin-layout-sider .ant-menu-item-selected::after {
+  border-right: 3px solid #1677ff;
+}
+.admin-layout-logo {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f1f1f;
+  border-bottom: 1px solid #f0f0f0;
+}
+.admin-layout-header {
+  background: #fff;
+  padding: 0 24px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(0,21,41,0.08);
+  z-index: 9;
+}

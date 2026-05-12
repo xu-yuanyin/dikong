@@ -221,6 +221,7 @@ export default defineConfig(async ({ command }) => {
       port: 51720, // 默认从 51720 开始，如果被占用会自动尝试 51721, 51722...
       strictPort: false, // 端口被占用时自动尝试下一个端口
       host: '0.0.0.0', // 统一使用 0.0.0.0 绑定，确保端口检测正确
+      allowedHosts: true, // 允许所有的外网穿透服务访问
       open: false, // 开发态不要自动打开浏览器，避免端口回退时误打开 51721/51722 等页面
       cors: true,
       // HMR 配置

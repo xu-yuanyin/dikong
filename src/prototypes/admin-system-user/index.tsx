@@ -1,150 +1,129 @@
 /**
- * @name 用户管理
+ * @name 后台系统用户管理
  * @mode axure
- * @see /skills/axure-export-workflow/SKILL.md
+ * /Users/xu/Desktop/元引信息/Axhub-Make-main/skills/axure-export-workflow/SKILL.md
+ *
  */
 
-import './style.css';
-import React, { useState } from 'react';
-import { Layout, Menu, Card, Table, Tag, Button, Space, Input, Select, Modal, Form, message, Dropdown, Avatar, Badge, Switch } from 'antd';
-import {
-  DashboardOutlined, FileTextOutlined, SafetyCertificateOutlined, EnvironmentOutlined,
-  AlertOutlined, CloudOutlined, SettingOutlined, UserOutlined, BellOutlined, LogoutOutlined,
-  RocketOutlined, SearchOutlined, EyeOutlined, PlusOutlined, EditOutlined, DeleteOutlined,
-  MenuFoldOutlined, MenuUnfoldOutlined, KeyOutlined,
-} from '@ant-design/icons';
 
-const { Header, Sider, Content } = Layout;
+import React, { useState, useCallback } from 'react';
+import AdminLayout from '../../components/AdminLayout';
+import { Card, Table, Tag, Button, Breadcrumb, Space, Modal, Form, Input, Select, message, Popconfirm, Tooltip, Row, Col } from 'antd';
+import { SettingOutlined, PlusOutlined, EditOutlined, StopOutlined, CheckCircleOutlined, LockOutlined, SearchOutlined, UserOutlined, PhoneOutlined, KeyOutlined, ClusterOutlined } from '@ant-design/icons';
 
-const AdminSystemUser: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
+var SYSTEM_ROLES = [
+  { value: 'super_admin', label: '超级管理员', color: 'red' },
+  { value: 'content_operator', label: '内容运营', color: 'blue' },
+  { value: 'auditor', label: '审核专员', color: 'green' },
+  { value: 'mall_manager', label: '商城管理员', color: 'orange' },
+  { value: 'financial', label: '财务管理员', color: 'purple' }
+];
 
-  const menuItems = [
-    { key: 'dashboard', icon: <DashboardOutlined />, label: '首页', path: '/prototypes/admin-dashboard' },
-    { key: 'content', icon: <FileTextOutlined />, label: '内容管理', children: [
-      { key: 'content-policy', label: '政策法规', path: '/prototypes/admin-content-policy' },
-      { key: 'content-notice', label: '通知公告', path: '/prototypes/admin-content-notice' },
-      { key: 'content-news', label: '行业资讯', path: '/prototypes/admin-content-news' },
-      { key: 'content-safety', label: '安全知识', path: '/prototypes/admin-content-safety' },
-    ]},
-    { key: 'service', icon: <SafetyCertificateOutlined />, label: '服务管理', children: [
-      { key: 'service-plan', label: '飞行计划审批', path: '/prototypes/admin-service-plan' },
-      { key: 'service-permit', label: '飞行许可管理', path: '/prototypes/admin-service-permit' },
-      { key: 'service-landing', label: '起降点管理', path: '/prototypes/admin-service-landing' },
-    ]},
-    { key: 'product', icon: <RocketOutlined />, label: '商品管理', children: [
-      { key: 'product-tour', label: '低空旅游', path: '/prototypes/admin-product-tour' },
-      { key: 'product-training', label: '培训服务', path: '/prototypes/admin-product-training' },
-      { key: 'product-maintenance', label: '维修保险', path: '/prototypes/admin-product-maintenance' },
-    ]},
-    { key: 'emergency', icon: <AlertOutlined />, label: '应急服务管理', children: [
-      { key: 'emergency-alarm', label: '报警处理', path: '/prototypes/admin-emergency-alarm' },
-      { key: 'emergency-rescue', label: '救援调度', path: '/prototypes/admin-emergency-rescue' },
-      { key: 'emergency-warning', label: '预警发布', path: '/prototypes/admin-emergency-warning' },
-    ]},
-    { key: 'airspace', icon: <EnvironmentOutlined />, label: '空域信息管理', children: [
-      { key: 'airspace-designated', label: '空域划设', path: '/prototypes/admin-airspace-designated' },
-      { key: 'airspace-route', label: '航路航线', path: '/prototypes/admin-airspace-route' },
-      { key: 'airspace-prohibited', label: '禁飞区域', path: '/prototypes/admin-airspace-prohibited' },
-    ]},
-    { key: 'weather', icon: <CloudOutlined />, label: '气象信息管理', path: '/prototypes/admin-weather' },
-    { key: 'system', icon: <SettingOutlined />, label: '系统管理', children: [
-      { key: 'system-user', label: '用户管理', path: '/prototypes/admin-system-user' },
-      { key: 'system-role', label: '角色管理', path: '/prototypes/admin-system-role' },
-      { key: 'system-log', label: '日志管理', path: '/prototypes/admin-system-log' },
-    ]},
-  ];
+var DEPARTMENTS = [
+  { value: 'tech', label: '技术部' },
+  { value: 'operation', label: '运营部' },
+  { value: 'audit', label: '审核中心' },
+  { value: 'commerce', label: '商务部' }
+];
 
-  const handleMenuClick = (e: any) => {
-    const findPath = (items: any[]): string | null => {
-      for (const item of items) {
-        if (item.key === e.key) return item.path;
-        if (item.children) { const found = findPath(item.children); if (found) return found; }
-      }
-      return null;
-    };
-    const path = findPath(menuItems);
-    if (path) window.location.href = path;
-  };
+var SYSTEM_USER_DATA = [
+  { key: '1', id: 1001, username: 'admin', realName: '王建国', phone: '13800000001', department: 'tech', role: 'super_admin', status: 'normal', createTime: '2026-01-01' },
+  { key: '2', id: 1002, username: 'op_zhang', realName: '张芳', phone: '13800000002', department: 'operation', role: 'content_operator', status: 'normal', createTime: '2026-03-10' },
+  { key: '3', id: 1003, username: 'audit_li', realName: '李伟', phone: '13800000003', department: 'audit', role: 'auditor', status: 'normal', createTime: '2026-03-15' },
+  { key: '4', id: 1004, username: 'mall_zhao', realName: '赵刚', phone: '13800000004', department: 'commerce', role: 'mall_manager', status: 'disabled', createTime: '2026-04-05' }
+];
 
-  const userMenu = (
-    <Menu>
-      <Menu.Item key="profile" icon={<UserOutlined />}>个人中心</Menu.Item>
-      <Menu.Item key="settings" icon={<SettingOutlined />}>系统设置</Menu.Item>
-      <Menu.Divider />
-      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={() => window.location.href = '/prototypes/admin-login'}>退出登录</Menu.Item>
-    </Menu>
-  );
 
-  const dataSource = [
-    { id: 1, username: 'admin', name: '系统管理员', role: '超级管理员', department: '信息中心', phone: '138****1234', email: 'admin@example.com', status: true, lastLogin: '2024-01-20 14:30' },
-    { id: 2, username: 'zhangsan', name: '张三', role: '运营管理员', department: '运营部', phone: '139****5678', email: 'zhangsan@example.com', status: true, lastLogin: '2024-01-20 10:15' },
-    { id: 3, username: 'lisi', name: '李四', role: '审批员', department: '审批中心', phone: '137****9012', email: 'lisi@example.com', status: true, lastLogin: '2024-01-19 16:45' },
-    { id: 4, username: 'wangwu', name: '王五', role: '客服', department: '客服部', phone: '136****3456', email: 'wangwu@example.com', status: false, lastLogin: '2024-01-15 09:30' },
-    { id: 5, username: 'zhaoliu', name: '赵六', role: '数据分析师', department: '数据中心', phone: '135****7890', email: 'zhaoliu@example.com', status: true, lastLogin: '2024-01-20 11:20' },
-  ];
 
-  const columns = [
-    { title: 'ID', dataIndex: 'id', width: 60 },
-    { title: '用户名', dataIndex: 'username', width: 100 },
-    { title: '姓名', dataIndex: 'name', width: 100 },
-    { title: '角色', dataIndex: 'role', width: 110, render: (text: string) => <Tag color="blue">{text}</Tag> },
-    { title: '部门', dataIndex: 'department', width: 100 },
-    { title: '手机号', dataIndex: 'phone', width: 110 },
-    { title: '邮箱', dataIndex: 'email', ellipsis: true },
-    { title: '状态', dataIndex: 'status', width: 90, render: (status: boolean) => <Switch checked={status} size="small" onChange={() => message.success('状态已更新')} /> },
-    { title: '最后登录', dataIndex: 'lastLogin', width: 150 },
-    { title: '操作', width: 180, render: () => (
-      <Space>
-        <Button type="link" size="small" icon={<EyeOutlined />}>查看</Button>
-        <Button type="link" size="small" icon={<EditOutlined />}>编辑</Button>
-        <Button type="link" size="small" icon={<KeyOutlined />}>重置密码</Button>
-        <Button type="link" size="small" danger icon={<DeleteOutlined />}>删除</Button>
-      </Space>
-    )},
+var Component = function AdminSystemUserPage() {
+  var [addOpen, setAddOpen] = useState(false);
+  var [editOpen, setEditOpen] = useState(false);
+  var [addForm] = Form.useForm();
+  var [editForm] = Form.useForm();
+
+  var handleNavigate = useCallback(function (key: string) {
+    window.location.href = '/prototypes/' + key;
+  }, []);
+
+  var columns = [
+    { title: '工号', dataIndex: 'id', key: 'id', width: 80 },
+    { title: '账号', dataIndex: 'username', key: 'username', width: 120, render: function (t: string) { return <span style={{ fontWeight: 600 }}>{t}</span>; } },
+    { title: '姓名', dataIndex: 'realName', key: 'realName', width: 100 },
+    { title: '联系电话', dataIndex: 'phone', key: 'phone', width: 140 },
+    { title: '所属部门', dataIndex: 'department', key: 'department', width: 120, render: function (t: string) { var d = DEPARTMENTS.find(function (item) { return item.value === t; }); return d ? d.label : t; } },
+    { title: '系统角色', dataIndex: 'role', key: 'role', width: 120, render: function (t: string) { var r = SYSTEM_ROLES.find(function (item) { return item.value === t; }); return <Tag color={r ? r.color : 'default'}>{r ? r.label : t}</Tag>; } },
+    { title: '状态', dataIndex: 'status', key: 'status', width: 80, render: function (t: string) { return t === 'normal' ? <Tag color="green">正常</Tag> : <Tag color="red">已禁用</Tag>; } },
+    { title: '创建时间', dataIndex: 'createTime', key: 'createTime', width: 120 },
+    { title: '操作', key: 'action', width: 160, fixed: 'right' as const, render: function (_: any, record: any) {
+      return (
+        <Space size={4}>
+          <Tooltip title="编辑"><Button type="text" size="small" icon={<EditOutlined />} style={{ color: '#fa8c16' }} onClick={function () { editForm.setFieldsValue(record); setEditOpen(true); }} /></Tooltip>
+          {record.status === 'normal' ? (
+            <Tooltip title="禁用"><Popconfirm title="确定禁用该员工账号？" onConfirm={function () { message.success('账号已禁用'); }}><Button type="text" size="small" icon={<StopOutlined />} style={{ color: '#ff4d4f' }} /></Popconfirm></Tooltip>
+          ) : (
+            <Tooltip title="启用"><Popconfirm title="确定启用该员工账号？" onConfirm={function () { message.success('账号已启用'); }}><Button type="text" size="small" icon={<CheckCircleOutlined />} style={{ color: '#52c41a' }} /></Popconfirm></Tooltip>
+          )}
+          <Tooltip title="重置密码"><Popconfirm title="确定重置密码为 123456？" onConfirm={function () { message.success('密码已重置'); }}><Button type="text" size="small" icon={<LockOutlined />} style={{ color: '#1677ff' }} /></Popconfirm></Tooltip>
+        </Space>
+      );
+    }}
   ];
 
   return (
-    <Layout className="admin-layout">
-      <Sider trigger={null} collapsible collapsed={collapsed} className="admin-sider" width={220}>
-        <div className="admin-logo"><RocketOutlined />{!collapsed && <span>低空服务管理后台</span>}</div>
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={['system-user']} defaultOpenKeys={['system']} items={menuItems} onClick={handleMenuClick} />
-      </Sider>
-      <Layout>
-        <Header className="admin-header">
-          <div className="admin-header-left">{React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, { className: 'admin-trigger', onClick: () => setCollapsed(!collapsed) })}</div>
-          <div className="admin-header-right">
-            <Badge count={5} size="small"><BellOutlined className="admin-header-icon" /></Badge>
-            <Dropdown menu={{ items: userMenu as any }} placement="bottomRight"><div className="admin-header-user"><Avatar size="small" icon={<UserOutlined />} /><span>管理员</span></div></Dropdown>
+    <AdminLayout activeKey="admin-system-user">
+      
+
+      <div style={{ maxWidth: 1400, margin: '0 auto', padding: 24 }}>
+        <Breadcrumb items={[{ title: '系统设置' }, { title: '后台系统用户管理' }]} style={{ marginBottom: 16 }} />
+        <Card style={{ borderRadius: 12 }}>
+          <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+            <Input prefix={<SearchOutlined />} placeholder="搜索账号/姓名" style={{ width: 220 }} allowClear />
+            <Select placeholder="部门筛选" style={{ width: 140 }} options={DEPARTMENTS} allowClear />
+            <Select placeholder="系统角色" style={{ width: 140 }} options={SYSTEM_ROLES} allowClear />
+            <Button type="primary" icon={<SearchOutlined />}>查询</Button>
+            <div style={{ flex: 1 }} />
+            <Button type="primary" icon={<PlusOutlined />} onClick={function () { addForm.resetFields(); setAddOpen(true); }}>新增运营账号</Button>
           </div>
-        </Header>
-        <Content className="admin-content">
-          <Card title="用户管理" extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => setModalVisible(true)}>新增用户</Button>}>
-            <div style={{ marginBottom: 16, display: 'flex', gap: 16 }}>
-              <Input placeholder="搜索用户名/姓名" prefix={<SearchOutlined />} style={{ width: 200 }} />
-              <Select placeholder="角色" style={{ width: 140 }} allowClear><Select.Option value="超级管理员">超级管理员</Select.Option><Select.Option value="运营管理员">运营管理员</Select.Option><Select.Option value="审批员">审批员</Select.Option><Select.Option value="客服">客服</Select.Option></Select>
-              <Select placeholder="部门" style={{ width: 120 }} allowClear><Select.Option value="信息中心">信息中心</Select.Option><Select.Option value="运营部">运营部</Select.Option><Select.Option value="审批中心">审批中心</Select.Option><Select.Option value="客服部">客服部</Select.Option></Select>
-              <Select placeholder="状态" style={{ width: 100 }} allowClear><Select.Option value={true}>启用</Select.Option><Select.Option value={false}>禁用</Select.Option></Select>
-              <Button type="primary">搜索</Button><Button>重置</Button>
-            </div>
-            <Table dataSource={dataSource} columns={columns} rowKey="id" pagination={{ pageSize: 10, showTotal: (total) => `共 ${total} 条` }} />
-          </Card>
-          <Modal title="新增用户" open={modalVisible} onCancel={() => setModalVisible(false)} width={600} footer={[<Button key="cancel" onClick={() => setModalVisible(false)}>取消</Button>, <Button key="submit" type="primary" onClick={() => { message.success('创建成功'); setModalVisible(false); }}>确定</Button>]}>
-            <Form layout="vertical">
-              <Form.Item label="用户名" required><Input placeholder="请输入用户名" /></Form.Item>
-              <Form.Item label="姓名" required><Input placeholder="请输入姓名" /></Form.Item>
-              <Form.Item label="角色" required><Select placeholder="请选择角色"><Select.Option value="运营管理员">运营管理员</Select.Option><Select.Option value="审批员">审批员</Select.Option><Select.Option value="客服">客服</Select.Option><Select.Option value="数据分析师">数据分析师</Select.Option></Select></Form.Item>
-              <Form.Item label="部门" required><Input placeholder="请输入部门" /></Form.Item>
-              <Form.Item label="手机号" required><Input placeholder="请输入手机号" /></Form.Item>
-              <Form.Item label="邮箱" required><Input placeholder="请输入邮箱" /></Form.Item>
-              <Form.Item label="初始密码" required><Input.Password placeholder="请输入初始密码" /></Form.Item>
-            </Form>
-          </Modal>
-        </Content>
-      </Layout>
-    </Layout>
+          <Table columns={columns} dataSource={SYSTEM_USER_DATA} pagination={{ pageSize: 10, total: SYSTEM_USER_DATA.length }} />
+        </Card>
+      </div>
+
+      <Modal title="新增运营账号" open={addOpen} onCancel={function () { setAddOpen(false); }} width={720} footer={[<Button key="c" onClick={function () { setAddOpen(false); }}>关闭</Button>, <Button key="p" type="primary" onClick={function () { message.success('运营账号创建成功'); setAddOpen(false); }}>确认创建</Button>]}>
+        <Form form={addForm} layout="vertical" style={{ marginTop: 16 }}>
+          <Row gutter={16}>
+            <Col span={12}><Form.Item name="username" label="登录账号" rules={[{ required: true, message: '请输入' }]}><Input prefix={<UserOutlined />} placeholder="仅限字母和数字" /></Form.Item></Col>
+            <Col span={12}><Form.Item name="password" label="初始密码" rules={[{ required: true, message: '请输入' }]}><Input.Password prefix={<KeyOutlined />} placeholder="请设置初始密码" /></Form.Item></Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}><Form.Item name="realName" label="真实姓名" rules={[{ required: true, message: '请输入' }]}><Input placeholder="员工姓名" /></Form.Item></Col>
+            <Col span={12}><Form.Item name="phone" label="联系电话" rules={[{ required: true, message: '请输入' }]}><Input prefix={<PhoneOutlined />} placeholder="手机号" /></Form.Item></Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}><Form.Item name="department" label="所属部门" rules={[{ required: true, message: '请选择' }]}><Select options={DEPARTMENTS} placeholder="请选择部门" /></Form.Item></Col>
+            <Col span={12}><Form.Item name="role" label="分配角色" rules={[{ required: true, message: '请选择' }]}><Select options={SYSTEM_ROLES} placeholder="分配系统权限角色" /></Form.Item></Col>
+          </Row>
+          <Form.Item name="remark" label="备注说明"><Input.TextArea rows={2} /></Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal title="编辑账号信息" open={editOpen} onCancel={function () { setEditOpen(false); }} width={720} footer={[<Button key="c" onClick={function () { setEditOpen(false); }}>关闭</Button>, <Button key="s" type="primary" onClick={function () { message.success('保存成功'); setEditOpen(false); }}>保存</Button>]}>
+        <Form form={editForm} layout="vertical" style={{ marginTop: 16 }}>
+          <Row gutter={16}>
+            <Col span={12}><Form.Item name="username" label="登录账号"><Input disabled /></Form.Item></Col>
+            <Col span={12}><Form.Item name="realName" label="真实姓名" rules={[{ required: true, message: '请输入' }]}><Input /></Form.Item></Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}><Form.Item name="phone" label="联系电话" rules={[{ required: true, message: '请输入' }]}><Input /></Form.Item></Col>
+            <Col span={12}><Form.Item name="department" label="所属部门" rules={[{ required: true, message: '请选择' }]}><Select options={DEPARTMENTS} /></Form.Item></Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}><Form.Item name="role" label="分配角色" rules={[{ required: true, message: '请选择' }]}><Select options={SYSTEM_ROLES} /></Form.Item></Col>
+            <Col span={12}><Form.Item name="status" label="账号状态"><Select options={[{ value: 'normal', label: '正常' }, { value: 'disabled', label: '禁用' }]} /></Form.Item></Col>
+          </Row>
+        </Form>
+      </Modal>
+    </AdminLayout>
   );
 };
 
-export default AdminSystemUser;
+export default Component;
