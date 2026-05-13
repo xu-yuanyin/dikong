@@ -66,13 +66,43 @@ const Component = function ServiceListPage() {
         </div>
       </header>
 
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 24px 48px' }}>
-        <Breadcrumb items={[
-          { title: <a onClick={() => handleNavigate('home')}><HomeOutlined /> 首页</a> },
-          { title: <a onClick={() => handleNavigate('service-show')}>低空服务</a> },
-          { title: '服务大厅' }
-        ]} style={{ marginBottom: 24 }} />
+      {/* Banner Area */}
+      <div style={{ background: 'linear-gradient(135deg, #0c4a6e 0%, #1677ff 100%)', padding: '24px 24px 72px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          {/* 顶部白色面包屑 */}
+          <Breadcrumb 
+            separator={<span style={{ color: 'rgba(255,255,255,0.4)' }}>/</span>}
+            items={[
+              { title: <a style={{ color: 'rgba(255,255,255,0.85)' }} onClick={() => handleNavigate('home')}><HomeOutlined /> 首页</a> },
+              { title: <span style={{ color: '#fff', fontWeight: 500 }}>低空服务大厅</span> }
+            ]} 
+            style={{ marginBottom: 24 }} 
+          />
 
+          <div style={{ textAlign: 'center', marginTop: 16 }}>
+            <CompassOutlined style={{ fontSize: 48, color: '#fff', marginBottom: 16 }} />
+            <h1 style={{ fontSize: 32, fontWeight: 700, color: '#fff', marginBottom: 12 }}>低空服务大厅</h1>
+            <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.85)', marginBottom: 32 }}>汇聚优质低空服务资源，为您提供专业、安全、高效的一站式低空服务解决方案</p>
+          
+          <div style={{ maxWidth: 600, margin: '0 auto', display: 'flex', gap: 12 }}>
+            <Input.Search 
+              size="large" 
+              placeholder="搜索航拍、植保、测绘等低空服务..." 
+              enterButton="搜索服务" 
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              style={{ flex: 1 }}
+            />
+            <Button size="large" type="primary" style={{ background: '#52c41a', borderColor: '#52c41a', fontWeight: 600, whiteSpace: 'nowrap' }} onClick={() => handleNavigate('service-publish')}>
+              我要发布服务
+            </Button>
+          </div>
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 8 }}>* 仅飞行服务商和飞手可发布服务</p>
+        </div>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 1200, margin: '-40px auto 0', padding: '0 24px 48px', position: 'relative', zIndex: 10 }}>
         {/* 分类图标卡片 */}
         <Row gutter={[12, 12]} style={{ marginBottom: 24 }}>
           {CATEGORIES.map((cat) => (
@@ -108,22 +138,13 @@ const Component = function ServiceListPage() {
           ))}
         </Row>
 
-        {/* 搜索栏 + 结果统计 */}
+        {/* 结果统计 */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontSize: 16, fontWeight: 600, color: '#1f1f1f' }}>
               {selectedCategory === '全部' ? '全部服务' : selectedCategory}
             </span>
-            <Tag color="blue">{filteredServices.length} 项服务</Tag>
           </div>
-          <Input
-            prefix={<SearchOutlined />}
-            placeholder="搜索服务名称或商家..."
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            style={{ width: 300 }}
-            allowClear
-          />
         </div>
 
         {/* 服务卡片列表 */}

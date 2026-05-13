@@ -76,7 +76,7 @@ const DIRECTORY = [
     title: '低空服务 (Services)',
     icon: <AppstoreOutlined style={{ color: '#52c41a' }} />,
     links: [
-      { key: 'service-show', label: '服务展示 (低空服务门户)' },
+      { key: 'service-list', label: '服务展示 (低空服务门户)' },
       { key: 'service-list', label: '服务大厅' },
       { key: 'service-detail', label: '服务详情' },
       { key: 'service-category-detail', label: '服务类目详情' },
@@ -151,7 +151,7 @@ export default function SitemapPage() {
             <a style={{ color: 'rgba(255,255,255,0.85)', cursor: 'pointer' }} onClick={() => handleNavigate('home')}>返回首页</a>
             <a style={{ color: 'rgba(255,255,255,0.85)', cursor: 'pointer' }} onClick={() => handleNavigate('news')}>资讯公告</a>
             <a style={{ color: 'rgba(255,255,255,0.85)', cursor: 'pointer' }} onClick={() => handleNavigate('policy-national')}>政策法规</a>
-            <a style={{ color: 'rgba(255,255,255,0.85)', cursor: 'pointer' }} onClick={() => handleNavigate('service-show')}>低空服务</a>
+            <a style={{ color: 'rgba(255,255,255,0.85)', cursor: 'pointer' }} onClick={() => handleNavigate('service-list')}>低空服务</a>
             <a style={{ color: 'rgba(255,255,255,0.85)', cursor: 'pointer' }} onClick={() => handleNavigate('mall-list')}>低空商城</a>
             <a style={{ color: 'rgba(255,255,255,0.85)', cursor: 'pointer' }} onClick={() => handleNavigate('flight-dynamic')}>飞行服务</a>
             <a style={{ color: 'rgba(255,255,255,0.85)', cursor: 'pointer' }} onClick={() => handleNavigate('profile-certified')}>个人中心</a>

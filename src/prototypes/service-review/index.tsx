@@ -57,7 +57,7 @@ var PORTAL_NAV = [
   { key: 'home', label: '首页' },
   { key: 'news', label: '资讯公告' },
   { key: 'policy-national', label: '政策法规' },
-  { key: 'service-show', label: '低空服务' },
+  { key: 'service-list', label: '低空服务' },
   { key: 'mall-list', label: '低空商城' },
   { key: 'flight-dynamic', label: '飞行服务' },
   { key: 'login', label: '登录' }
@@ -90,7 +90,7 @@ var Component = function ServiceReviewPage() {
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 24px 48px' }}>
         <Breadcrumb items={[
           { title: <a onClick={function () { handleNavigate('home'); }}><HomeOutlined /> 首页</a> },
-          { title: <a onClick={function () { handleNavigate('service-show'); }}>服务概览</a> },
+          { title: <a onClick={function () { handleNavigate('service-list'); }}>服务大厅</a> },
           { title: '服务评价' }
         ]} style={{ marginBottom: 20 }} />
 

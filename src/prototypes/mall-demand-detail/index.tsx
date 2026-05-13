@@ -44,7 +44,7 @@ var PORTAL_NAV = [
   { key: 'home', label: '首页' },
   { key: 'news', label: '资讯公告' },
   { key: 'policy-national', label: '政策法规' },
-  { key: 'service-show', label: '低空服务' },
+  { key: 'service-list', label: '低空服务' },
   { key: 'mall-list', label: '低空商城', active: true },
   { key: 'flight-dynamic', label: '飞行服务' },
   { key: 'login', label: '登录' }

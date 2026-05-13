@@ -42,7 +42,7 @@ var PORTAL_NAV = [
   { key: 'home', label: '首页' },
   { key: 'news', label: '资讯公告' },
   { key: 'policy-national', label: '政策法规' },
-  { key: 'service-show', label: '低空服务' },
+  { key: 'service-list', label: '低空服务' },
   { key: 'mall-list', label: '低空商城' },
   { key: 'flight-dynamic', label: '飞行服务' },
   { key: 'login', label: '登录' }
@@ -73,11 +73,11 @@ var Component = function DemandPublishPage() {
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '24px 24px 48px' }}>
         <Breadcrumb items={[
           { title: <a onClick={function () { handleNavigate('home'); }}><HomeOutlined /> 首页</a> },
-          { title: <a onClick={function () { handleNavigate('service-show'); }}>服务概览</a> },
+          { title: <a onClick={function () { handleNavigate('service-list'); }}>服务大厅</a> },
           { title: '需求发布' }
         ]} style={{ marginBottom: 20 }} />
 
-        <a onClick={function () { handleNavigate('service-show'); }} style={{ color: '#1677ff', cursor: 'pointer', fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 4, marginBottom: 16 }}>
+        <a onClick={function () { handleNavigate('service-list'); }} style={{ color: '#1677ff', cursor: 'pointer', fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 4, marginBottom: 16 }}>
           <ArrowLeftOutlined /> 返回服务大厅
         </a>
 
@@ -133,7 +133,7 @@ var Component = function DemandPublishPage() {
             </Row>
             <Form.Item>
               <div style={{ display: 'flex', gap: 12 }}>
-                <Button size="large" onClick={function () { handleNavigate('service-show'); }}>关闭</Button>
+                <Button size="large" onClick={function () { handleNavigate('service-list'); }}>关闭</Button>
                 <Button type="primary" size="large" style={{ flex: 1 }} onClick={function () {
                   form.validateFields().then(function () { message.success('需求发布成功，等待服务商响应！'); }).catch(function () {});
                 }}>发布需求</Button>

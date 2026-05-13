@@ -618,7 +618,7 @@ var Component = function HomePage() {
                     return (
                       <Col key={mod.key} span={8}>
                         <div
-                          onClick={function () { requireLogin(function () { handleNavigate('service-show'); }); }}
+                          onClick={function () { requireLogin(function () { handleNavigate('service-list'); }); }}
                           style={{
                             display: 'flex',
                             flexDirection: 'column',
