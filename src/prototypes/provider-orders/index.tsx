@@ -27,7 +27,7 @@ var MENU_ITEMS = [
 ];
 
 var ORDER_DATA = [
-  { key: '1', service: '城市空中观光体验', contact: '张先生', phone: '13812345678', req: '希望下周三在江北区进行飞行体验。', date: '2026-05-12 10:30', status: '待联系' },
+  { key: '1', service: '城市空中观光体验', contact: '张先生', phone: '13812345678', req: '希望下周三在江北区进行飞行体验。', date: '2026-05-12 10:30', status: '待处理' },
   { key: '2', service: '无人机驾照培训', contact: '李女士', phone: '13987654321', req: '咨询周末班的上课时间与费用明细。', date: '2026-05-11 14:20', status: '进行中' },
   { key: '3', service: '航拍测绘外包', contact: '赵总', phone: '13655556666', req: '需要对园区进行正射影像拍摄。', date: '2026-05-10 11:00', status: '待确认' },
   { key: '4', service: '飞行器年检检测', contact: '王经理', phone: '13700001111', req: '公司有3台大疆M300需要做年度检修。', date: '2026-05-09 09:15', status: '已完成' },
@@ -55,12 +55,12 @@ var Component = function ProviderOrdersPage() {
     { title: '需求备注', dataIndex: 'req', key: 'req', width: 250 },
     { title: '提交时间', dataIndex: 'date', key: 'date' },
     { title: '状态', dataIndex: 'status', key: 'status', render: function (s: string) { 
-      return <Tag color={s === '待联系' ? 'orange' : s === '进行中' ? 'blue' : s === '待确认' ? 'cyan' : 'green'}>{s}</Tag>; 
+      return <Tag color={s === '待处理' ? 'orange' : s === '进行中' ? 'blue' : s === '待确认' ? 'cyan' : 'green'}>{s}</Tag>; 
     }},
     { title: '操作', key: 'action', render: function (_: any, record: any) {
       return (
         <div style={{ display: 'flex', gap: 8 }}>
-          {record.status === '待联系' && <a onClick={() => updateStatus('进行中')}>标记为进行中</a>}
+          {record.status === '待处理' && <a onClick={() => updateStatus('进行中')}>标记为进行中</a>}
           {record.status === '进行中' && <a onClick={() => updateStatus('待确认')}>提交交付</a>}
           {record.status === '待确认' && <span style={{ color: '#bfbfbf' }}>等待客户确认</span>}
           <a style={{ color: '#8c8c8c' }}>查看详情</a>
@@ -129,8 +129,8 @@ var Component = function ProviderOrdersPage() {
             <Card title="收到的客户工单" style={{ borderRadius: 12 }}>
               <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
                 <div style={{ padding: '12px 10px', background: '#fff7e6', borderRadius: 8, textAlign: 'center', flex: 1 }}>
-                  <div style={{ fontSize: 24, fontWeight: 700, color: '#fa8c16' }}>{ORDER_DATA.filter(d => d.status === '待联系').length}</div>
-                  <div style={{ fontSize: 12, color: '#8c8c8c' }}>待联系</div>
+                  <div style={{ fontSize: 24, fontWeight: 700, color: '#fa8c16' }}>{ORDER_DATA.filter(d => d.status === '待处理').length}</div>
+                  <div style={{ fontSize: 12, color: '#8c8c8c' }}>待处理</div>
                 </div>
                 <div style={{ padding: '12px 10px', background: '#e6f4ff', borderRadius: 8, textAlign: 'center', flex: 1 }}>
                   <div style={{ fontSize: 24, fontWeight: 700, color: '#1677ff' }}>{ORDER_DATA.filter(d => d.status === '进行中').length}</div>

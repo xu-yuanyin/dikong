@@ -27,15 +27,15 @@ var MENU_ITEMS = [
 ];
 
 var BOOKED_DATA = [
-  { key: '1', orderNo: 'SRV20260512001', name: '山地物资调运', category: '行业应用', price: '¥1,200/架次', bookDate: '2026-05-12 14:00', provider: '大疆通用航空', contact: '王工', phone: '138-0000-8888', myContact: '张明', myPhone: '13800138000', requirements: '希望下周三在二七区山区进行服务，时间大约在下午2点左右，需要运输约100kg物资。', status: '待联系', rating: null },
-  { key: '2', orderNo: 'SRV20260505002', name: '多旋翼驾驶员考证培训', category: '飞行培训', price: '¥8,500/人', bookDate: '2026-05-05 09:00', provider: '中航航空飞行学院', contact: '李老师', phone: '139-1111-2222', myContact: '张明', myPhone: '13800138000', requirements: '本人零基础，希望能安排在周末班学习，尽快拿证。', status: '待联系', rating: null },
+  { key: '1', orderNo: 'SRV20260512001', name: '山地物资调运', category: '行业应用', price: '¥1,200/架次', bookDate: '2026-05-12 14:00', provider: '大疆通用航空', contact: '王工', phone: '138-0000-8888', myContact: '张明', myPhone: '13800138000', requirements: '希望下周三在二七区山区进行服务，时间大约在下午2点左右，需要运输约100kg物资。', status: '待处理', rating: null },
+  { key: '2', orderNo: 'SRV20260505002', name: '多旋翼驾驶员考证培训', category: '飞行培训', price: '¥8,500/人', bookDate: '2026-05-05 09:00', provider: '中航航空飞行学院', contact: '李老师', phone: '139-1111-2222', myContact: '张明', myPhone: '13800138000', requirements: '本人零基础，希望能安排在周末班学习，尽快拿证。', status: '待处理', rating: null },
   { key: '3', orderNo: 'SRV20260510003', name: '电力通信巡检', category: '行业应用', price: '¥3,000/天', bookDate: '2026-05-10 11:00', provider: '中科星图测绘', contact: '赵经理', phone: '137-3333-4444', myContact: '李四', myPhone: '13800138000', requirements: '需巡检线路长度约 10KM，请提前准备高精度挂载设备。', status: '已完成', rating: null },
   { key: '4', orderNo: 'SRV20260415004', name: '大疆 M300 年度适航检测', category: '飞行器服务', price: '¥2,000/次', bookDate: '2026-04-15 10:00', provider: '大疆官方售后(郑州)', contact: '技术支持', phone: '400-000-0000', myContact: '张明', myPhone: '13800138000', requirements: '飞机图传模块有时会断连，请重点排查，周五下午送过去。', status: '已完成', rating: 4.7 },
   { key: '5', orderNo: 'SRV20260410005', name: '特色活动航拍', category: '航拍影像', price: '¥2,800/场', bookDate: '2026-04-10 15:00', provider: '光影视觉传媒', contact: '刘总', phone: '186-5555-6666', myContact: '王五', myPhone: '13800138000', requirements: '公司团建航拍，包含大合照和花絮，需要剪辑一段3分钟的成片。', status: '已取消', rating: null }
 ];
 
 var STATUS_MAP: Record<string, { color: string, step: number }> = {
-  '待联系': { color: 'orange', step: 0 },
+  '待处理': { color: 'orange', step: 0 },
   '已完成': { color: 'green', step: 2 },
   '已取消': { color: 'default', step: -1 }
 };
@@ -70,7 +70,7 @@ var Component = function MyOrdersPage() {
       return (
         <div style={{ display: 'flex', gap: 12 }}>
           <a style={{ color: '#1677ff' }} onClick={() => setDetailRecord(record)}>查看</a>
-          {record.status === '待联系' && (
+          {record.status === '待处理' && (
             <>
               <a style={{ color: '#52c41a' }} onClick={handleConfirm}>标记完成</a>
               <a style={{ color: '#ff4d4f' }} onClick={handleCancel}>取消预约</a>
@@ -154,7 +154,7 @@ var Component = function MyOrdersPage() {
                 onChange={setActiveTab}
                 items={[
                   { key: 'all', label: `全部 (${BOOKED_DATA.length})` },
-                  { key: '待联系', label: `待联系 (${BOOKED_DATA.filter(d => d.status === '待联系').length})` },
+                  { key: '待处理', label: `待处理 (${BOOKED_DATA.filter(d => d.status === '待处理').length})` },
                   { key: '已完成', label: `已完成 (${BOOKED_DATA.filter(d => d.status === '已完成').length})` },
                   { key: '已取消', label: `已取消 (${BOOKED_DATA.filter(d => d.status === '已取消').length})` }
                 ]}
@@ -174,8 +174,8 @@ var Component = function MyOrdersPage() {
         width={700}
         footer={[
           <Button key="close" onClick={() => setDetailRecord(null)}>关闭</Button>,
-          detailRecord?.status === '待联系' && <Button key="cancel" danger onClick={handleCancel}>取消预约</Button>,
-          detailRecord?.status === '待联系' && <Button key="confirm" type="primary" style={{ background: '#52c41a' }} onClick={handleConfirm}>标记完成</Button>,
+          detailRecord?.status === '待处理' && <Button key="cancel" danger onClick={handleCancel}>取消预约</Button>,
+          detailRecord?.status === '待处理' && <Button key="confirm" type="primary" style={{ background: '#52c41a' }} onClick={handleConfirm}>标记完成</Button>,
           detailRecord?.status === '已完成' && <Button key="rate" type="primary" onClick={() => handleNavigate('service-review')}>去评价</Button>
         ].filter(Boolean)}
       >
@@ -190,7 +190,7 @@ var Component = function MyOrdersPage() {
                 <Steps
                   current={STATUS_MAP[detailRecord.status].step}
                   items={[
-                    { title: '提交预约', subTitle: '等待联系' },
+                    { title: '提交预约', subTitle: '待处理' },
                     { title: '线下对接', subTitle: '确认需求与作业' },
                     { title: '服务完结', subTitle: '评价与归档' }
                   ]}
