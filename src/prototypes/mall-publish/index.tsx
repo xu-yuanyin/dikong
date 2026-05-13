@@ -9,7 +9,7 @@ import './style.css';
 
 import React, { useState, useCallback } from 'react';
 import { Card, Form, Input, Select, Button, Breadcrumb, message, Upload, Row, Col, InputNumber } from 'antd';
-import { HomeOutlined, FileTextOutlined, ShoppingOutlined, UploadOutlined, ArrowLeftOutlined, PhoneOutlined, UserOutlined, DollarOutlined } from '@ant-design/icons';
+import { HomeOutlined, FileTextOutlined, ShoppingOutlined, UploadOutlined, ArrowLeftOutlined, PhoneOutlined, UserOutlined } from '@ant-design/icons';
 
 var CATEGORIES = [
   { value: 'aircraft', label: '飞行器' },
@@ -101,7 +101,7 @@ var Component = function MallPublishPage() {
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item name="price" label="售价" rules={[{ required: true, message: '请输入售价' }]}>
-                  <InputNumber size="large" prefix={<DollarOutlined />} style={{ width: '100%' }} placeholder="请输入售价" min={0} />
+                  <InputNumber size="large" prefix="¥" style={{ width: '100%' }} placeholder="请输入售价" min={0} />
                 </Form.Item>
               </Col>
               <Col span={12}>

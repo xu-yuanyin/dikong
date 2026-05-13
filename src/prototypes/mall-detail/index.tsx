@@ -16,13 +16,12 @@ var DETAIL = {
   category: '飞行器',
   price: '¥68,800',
   originalPrice: '¥72,000',
-  rating: 4.8,
   sales: 326,
-  reviews: 89,
   brand: '大疆创新',
   model: 'Matrice 350 RTK',
   supplier: 'XX无人机专营店',
-  supplierRating: 4.9,
+  contactPerson: '李经理',
+  contactPhone: '400-888-9999',
   highlight: '热销',
   desc: 'DJI Matrice 350 RTK 是大疆推出的旗舰级工业无人机平台，搭载全向避障和精准定位系统，续航长达 55 分钟，广泛应用于测绘、巡检、安防等专业领域。',
   specs: [
@@ -136,7 +135,6 @@ var Component = function MallDetailPage() {
               <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', fontSize: 13, color: '#8c8c8c', marginBottom: 16 }}>
                 <span>品牌：{DETAIL.brand}</span>
                 <span>型号：{DETAIL.model}</span>
-                <span><StarOutlined /> <Rate disabled defaultValue={DETAIL.rating} allowHalf style={{ fontSize: 12 }} /> {DETAIL.rating} ({DETAIL.reviews}评价)</span>
                 <span>已售 {DETAIL.sales}</span>
               </div>
 
@@ -225,10 +223,11 @@ var Component = function MallDetailPage() {
                   <div style={{ fontSize: 12, color: '#8c8c8c' }}><SafetyCertificateOutlined style={{ color: '#52c41a', marginRight: 4 }} />认证供应商</div>
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
-                <span style={{ fontSize: 13, color: '#8c8c8c' }}>店铺评分</span>
-                <Rate disabled defaultValue={DETAIL.supplierRating} allowHalf style={{ fontSize: 12 }} />
-                <span style={{ fontSize: 13, color: '#faad14' }}>{DETAIL.supplierRating}</span>
+              <div style={{ padding: 12, background: '#f5f5f5', borderRadius: 8 }}>
+                <div style={{ fontSize: 13, color: '#8c8c8c', marginBottom: 8 }}>联系人：{DETAIL.contactPerson}</div>
+                <div style={{ fontSize: 18, fontWeight: 600, color: '#722ed1', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <PhoneOutlined /> {DETAIL.contactPhone}
+                </div>
               </div>
             </Card>
             <Card style={{ borderRadius: 12 }}>

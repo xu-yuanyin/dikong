@@ -8,7 +8,7 @@
 import './style.css';
 
 import React, { useState, useCallback } from 'react';
-import { Card, Tag, Input, Row, Col, Pagination, Breadcrumb, Tabs, Button, Rate } from 'antd';
+import { Card, Tag, Input, Row, Col, Pagination, Breadcrumb, Tabs, Button } from 'antd';
 import { SearchOutlined, HomeOutlined, ShoppingOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 
 const PRODUCTS = [
@@ -117,8 +117,7 @@ const Component = function MallListPage() {
                     <span style={{ fontSize: 18, fontWeight: 700, color: '#ff4d4f' }}>{product.price}</span>
                     <span style={{ fontSize: 12, color: '#8c8c8c' }}>已售 {product.sales}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Rate disabled defaultValue={product.rating} allowHalf style={{ fontSize: 12 }} />
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                     <Button type="primary" size="small" onClick={function () { handleNavigate('mall-intention'); }}>采购意向</Button>
                   </div>
                 </Card>

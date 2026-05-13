@@ -73,7 +73,7 @@ var Component = function MallDemandPage() {
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
             <Input prefix={<SearchOutlined />} placeholder="搜索采购需求..." value={searchText} onChange={function (e) { setSearchText(e.target.value); }} style={{ width: 320 }} allowClear />
             <div style={{ flex: 1 }} />
-            <Button type="primary" icon={<PlusOutlined />} style={{ background: '#722ed1', borderColor: '#722ed1' }} onClick={function () { handleNavigate('mall-intention'); }}>发布采购需求</Button>
+            <Button type="primary" icon={<PlusOutlined />} style={{ background: '#722ed1', borderColor: '#722ed1' }} onClick={function () { handleNavigate('mall-demand-publish'); }}>发布采购需求</Button>
           </div>
         </Card>
 

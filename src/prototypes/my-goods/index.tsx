@@ -8,7 +8,7 @@
 import './style.css';
 
 import React, { useState, useCallback } from 'react';
-import { Card, Table, Tag, Button, Breadcrumb, Avatar, Row, Col, Select, message, Modal } from 'antd';
+import { Card, Table, Tag, Button, Breadcrumb, Avatar, Row, Col, Select, message, Modal, Tabs } from 'antd';
 import { HomeOutlined, UserOutlined, SafetyCertificateOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons';
 
 var MENU_ITEMS = [
@@ -29,11 +29,11 @@ var MENU_ITEMS = [
 ];
 
 var GOODS_DATA = [
-  { key: '1', name: 'DJI Matrice 350 RTK 工业级无人机', category: '飞行器', price: '¥68,800', stock: 15, sales: 23, status: '在售', createDate: '2026-03-10' },
-  { key: '2', name: '大疆 DJI Mavic 3 Enterprise', category: '飞行器', price: '¥23,800', stock: 28, sales: 45, status: '在售', createDate: '2026-02-18' },
-  { key: '3', name: '纵横 CW-25 垂直起降固定翼', category: '飞行器', price: '¥128,000', stock: 5, sales: 8, status: '在售', createDate: '2026-01-20' },
-  { key: '4', name: '特价三无电池', category: '配件', price: '¥500', stock: 0, sales: 12, status: '已违规下架', createDate: '2025-12-05' },
-  { key: '5', name: '道通 EVO Lite+ 航拍无人机', category: '飞行器', price: '¥7,999', stock: 20, sales: 67, status: '在售', createDate: '2026-04-01' }
+  { key: '1', name: 'DJI Matrice 350 RTK 工业级无人机', category: '飞行器', price: '¥68,800', stock: 15, sales: 23, status: '展示中', createDate: '2026-03-10' },
+  { key: '2', name: '大疆 DJI Mavic 3 Enterprise', category: '飞行器', price: '¥23,800', stock: 28, sales: 45, status: '已下线', createDate: '2026-02-18' },
+  { key: '3', name: '纵横 CW-25 垂直起降固定翼', category: '飞行器', price: '¥128,000', stock: 5, sales: 8, status: '展示中', createDate: '2026-01-20' },
+  { key: '4', name: '特价三无电池', category: '配件', price: '¥500', stock: 0, sales: 12, status: '违规下架', createDate: '2025-12-05' },
+  { key: '5', name: '道通 EVO Lite+ 航拍无人机', category: '飞行器', price: '¥7,999', stock: 20, sales: 67, status: '展示中', createDate: '2026-04-01' }
 ];
 
 var COLUMNS = [
@@ -42,17 +42,31 @@ var COLUMNS = [
   { title: '价格', dataIndex: 'price', key: 'price', render: function (p: string) { return <span style={{ color: '#ff4d4f', fontWeight: 600 }}>{p}</span>; } },
   { title: '库存', dataIndex: 'stock', key: 'stock', render: function (s: number) { return <span style={{ color: s === 0 ? '#ff4d4f' : s < 10 ? '#fa8c16' : '#52c41a' }}>{s}</span>; } },
   { title: '销量', dataIndex: 'sales', key: 'sales' },
-  { title: '状态', dataIndex: 'status', key: 'status', render: function (s: string) { return <Tag color={s === '在售' ? 'green' : s === '已违规下架' ? 'red' : 'default'}>{s}</Tag>; } },
+  { title: '状态', dataIndex: 'status', key: 'status', render: function (s: string) { return <Tag color={s === '展示中' ? 'green' : s === '违规下架' ? 'red' : 'default'}>{s}</Tag>; } },
   { title: '发布日期', dataIndex: 'createDate', key: 'createDate' },
   { title: '操作', key: 'action', render: function (_: any, record: any) {
-    if (record.status === '已违规下架') {
-      return <a style={{ color: '#ff4d4f' }} onClick={function () { Modal.error({ title: '违规下架原因', content: '您发布的商品因涉嫌违规宣传已被后台强制下架。如有异议请联系客服：400-xxx-xxxx' }); }}>查看原因</a>;
-    }
     return (
-      <div style={{ display: 'flex', gap: 8 }}>
-        <a onClick={function () { handleNavigate('mall-detail'); }}>查看</a>
-        <a onClick={function () { message.success('编辑商品'); }}>编辑</a>
-        <Select size="small" defaultValue={record.status} style={{ width: 80 }} options={[{ value: '在售', label: '在售' }, { value: '已下架', label: '已下架' }]} onChange={function (v) { message.success('状态已更新为：' + v); }} />
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+        <a style={{ color: '#1677ff' }} onClick={function () { handleNavigate('mall-detail'); }}>查看</a>
+        {record.status === '展示中' && (
+          <>
+            <a style={{ color: '#1677ff' }} onClick={function () { message.success('编辑商品'); }}>编辑</a>
+            <a style={{ color: '#faad14' }} onClick={function () { message.success('已下线'); }}>下线</a>
+          </>
+        )}
+        {record.status === '已下线' && (
+          <>
+            <a style={{ color: '#1677ff' }} onClick={function () { message.success('编辑商品'); }}>编辑</a>
+            <a style={{ color: '#52c41a' }} onClick={function () { message.success('已重新发布'); }}>重新发布</a>
+            <a style={{ color: '#ff4d4f' }} onClick={function () { message.success('已删除'); }}>删除</a>
+          </>
+        )}
+        {record.status === '违规下架' && (
+          <>
+            <a style={{ color: '#faad14' }} onClick={function () { Modal.error({ title: '违规详情', content: '您发布的商品涉嫌违规内容，已被管理员强制下架。如有异议请联系客服。' }); }}>查看原因</a>
+            <a style={{ color: '#ff4d4f' }} onClick={function () { message.success('已删除'); }}>删除</a>
+          </>
+        )}
       </div>
     );
   }}
@@ -63,6 +77,7 @@ var handleNavigate = function (key: string) {
 };
 
 var Component = function MyGoodsPage() {
+  var [activeTab, setActiveTab] = useState('all');
   return (
     <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
       <header style={{ background: 'linear-gradient(135deg, #0c4a6e 0%, #eb2f96 100%)', padding: '0 24px' }}>
@@ -128,11 +143,11 @@ var Component = function MyGoodsPage() {
             <Card title="我的商品" extra={<Button type="primary" icon={<PlusOutlined />} onClick={function () { handleNavigate('mall-publish'); }}>发布商品</Button>} style={{ borderRadius: 12 }}>
               <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
                 <div style={{ padding: '12px 20px', background: '#f6ffed', borderRadius: 8, textAlign: 'center' }}>
-                  <div style={{ fontSize: 20, fontWeight: 700, color: '#52c41a' }}>{GOODS_DATA.filter(function (g) { return g.status === '在售'; }).length}</div>
-                  <div style={{ fontSize: 12, color: '#8c8c8c' }}>在售商品</div>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: '#52c41a' }}>{GOODS_DATA.filter(function (g) { return g.status === '展示中'; }).length}</div>
+                  <div style={{ fontSize: 12, color: '#8c8c8c' }}>展示中</div>
                 </div>
                 <div style={{ padding: '12px 20px', background: '#fff7e6', borderRadius: 8, textAlign: 'center' }}>
-                  <div style={{ fontSize: 20, fontWeight: 700, color: '#fa8c16' }}>{GOODS_DATA.filter(function (g) { return g.status !== '在售'; }).length}</div>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: '#fa8c16' }}>{GOODS_DATA.filter(function (g) { return g.status !== '展示中'; }).length}</div>
                   <div style={{ fontSize: 12, color: '#8c8c8c' }}>异常/下架</div>
                 </div>
                 <div style={{ padding: '12px 20px', background: '#e6f4ff', borderRadius: 8, textAlign: 'center' }}>
@@ -140,7 +155,29 @@ var Component = function MyGoodsPage() {
                   <div style={{ fontSize: 12, color: '#8c8c8c' }}>总销量</div>
                 </div>
               </div>
-              <Table columns={COLUMNS} dataSource={GOODS_DATA} pagination={{ pageSize: 5 }} />
+              
+              {GOODS_DATA.filter(function (d) { return d.status === '违规下架'; }).length > 0 && (
+                <div style={{ padding: '8px 16px', background: '#fff2f0', border: '1px solid #ffccc7', borderRadius: 6, marginBottom: 16, color: '#cf1322', fontSize: 13 }}>
+                  系统提示：发现被违规下架的商品，涉嫌违反平台发布规范。如有疑问请致电客服咨询：400-123-4567。
+                </div>
+              )}
+              
+              <Tabs
+                activeKey={activeTab}
+                onChange={setActiveTab}
+                items={[
+                  { key: 'all', label: `全部 (${GOODS_DATA.length})` },
+                  { key: '展示中', label: `展示中 (${GOODS_DATA.filter(function (d) { return d.status === '展示中'; }).length})` },
+                  { key: '已下线', label: `已下线 (${GOODS_DATA.filter(function (d) { return d.status === '已下线'; }).length})` },
+                  { key: '违规下架', label: `违规下架 (${GOODS_DATA.filter(function (d) { return d.status === '违规下架'; }).length})` }
+                ]}
+                style={{ marginBottom: 0 }}
+              />
+              <Table 
+                columns={COLUMNS} 
+                dataSource={activeTab === 'all' ? GOODS_DATA : GOODS_DATA.filter(function(d) { return d.status === activeTab; })} 
+                pagination={{ pageSize: 5 }} 
+              />
             </Card>
           </Col>
         </Row>
