@@ -99,8 +99,8 @@ var Component = function DemandPublishPage() {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item name="area" label="服务区域" rules={[{ required: true, message: '请选择服务区域' }]}>
-                  <Select size="large" placeholder="请选择服务区域" options={AREA_OPTIONS} />
+                <Form.Item name="area" label="服务区域" rules={[{ required: true, message: '请输入服务区域' }]}>
+                  <Input size="large" placeholder="请输入期望的服务区域（如：高新区、全市等）" />
                 </Form.Item>
               </Col>
             </Row>
