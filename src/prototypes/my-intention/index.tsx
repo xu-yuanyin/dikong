@@ -21,11 +21,11 @@ var MENU_ITEMS = [
 ];
 
 var INTENTION_DATA = [
-  { key: '1', product: 'DJI Matrice 350 RTK 工业级无人机', type: '飞行器', quantity: 5, budget: '30-40万', status: '已报价', company: '大疆代理商', createDate: '2026-04-22', quoteCount: 3 },
-  { key: '2', product: '激光雷达测绘模块', type: '配件', quantity: 3, budget: '6-9万', status: '等待报价', company: '-', createDate: '2026-04-25', quoteCount: 0 },
-  { key: '3', product: '纵横 CW-25 垂直起降固定翼', type: '飞行器', quantity: 2, budget: '20-25万', status: '已成交', company: '纵横股份', createDate: '2026-04-10', quoteCount: 4 },
-  { key: '4', product: '飞宇 AK2000S 三轴稳定器', type: '配件', quantity: 10, budget: '2-3万', status: '已报价', company: '飞宇科技', createDate: '2026-04-18', quoteCount: 2 },
-  { key: '5', product: '道通 EVO Lite+ 航拍无人机', type: '飞行器', quantity: 8, budget: '5-7万', status: '已取消', company: '-', createDate: '2026-03-28', quoteCount: 1 }
+  { key: '1', product: 'DJI Matrice 350 RTK 工业级无人机', type: '飞行器', quantity: 5, budget: '¥30-40万', status: '已报价', company: '大疆代理商', createDate: '2026-04-22', quoteCount: 3 },
+  { key: '2', product: '激光雷达测绘模块', type: '配件', quantity: 3, budget: '¥6-9万', status: '等待报价', company: '-', createDate: '2026-04-25', quoteCount: 0 },
+  { key: '3', product: '纵横 CW-25 垂直起降固定翼', type: '飞行器', quantity: 2, budget: '¥20-25万', status: '已成交', company: '纵横股份', createDate: '2026-04-10', quoteCount: 4 },
+  { key: '4', product: '飞宇 AK2000S 三轴稳定器', type: '配件', quantity: 10, budget: '¥2-3万', status: '已报价', company: '飞宇科技', createDate: '2026-04-18', quoteCount: 2 },
+  { key: '5', product: '道通 EVO Lite+ 航拍无人机', type: '飞行器', quantity: 8, budget: '¥5-7万', status: '已取消', company: '-', createDate: '2026-03-28', quoteCount: 1 }
 ];
 
 var COLUMNS = [

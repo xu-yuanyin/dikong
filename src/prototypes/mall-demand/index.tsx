@@ -12,12 +12,12 @@ import { Card, Tag, Input, Row, Col, Breadcrumb, Button, Pagination } from 'antd
 import { SearchOutlined, HomeOutlined, ShoppingOutlined, PlusOutlined, EnvironmentOutlined, ClockCircleOutlined, DollarOutlined } from '@ant-design/icons';
 
 var DEMANDS = [
-  { id: 1, title: '求购 10 台工业级测绘无人机', category: '飞行器', budget: '50-80万', area: '全市', deadline: '2026-05-31', status: '进行中', company: 'XX测绘工程有限公司', time: '2026-04-20' },
-  { id: 2, title: '采购 5 套低空通信基站设备', category: '通信设备', budget: '20-30万', area: '主城区', deadline: '2026-06-15', status: '进行中', company: 'XX通信技术有限公司', time: '2026-04-18' },
-  { id: 3, title: '求购无人机反制系统 3 套', category: '安全设备', budget: '30-50万', area: '全市', deadline: '2026-05-20', status: '即将截止', company: 'XX安保服务集团', time: '2026-04-15' },
-  { id: 4, title: '采购 eVTOL 载人飞行器 2 架', category: '飞行器', budget: '500万以上', area: '全省', deadline: '2026-08-01', status: '进行中', company: 'XX低空旅游有限公司', time: '2026-04-12' },
-  { id: 5, title: '求购智能停机坪 20 套', category: '基础设施', budget: '60-80万', area: '全市', deadline: '2026-07-01', status: '进行中', company: 'XX城市管理运营中心', time: '2026-04-10' },
-  { id: 6, title: '采购飞行模拟训练系统 2 套', category: '培训设备', budget: '15-20万', area: '主城区', deadline: '2026-06-30', status: '已完成', company: 'XX飞行培训学校', time: '2026-04-05' }
+  { id: 1, title: '求购 10 台工业级测绘无人机', category: '飞行器', budget: '¥50-80万', area: '全市', deadline: '2026-05-31', status: '进行中', company: 'XX测绘工程有限公司', time: '2026-04-20' },
+  { id: 2, title: '采购 5 套低空通信基站设备', category: '通信设备', budget: '¥20-30万', area: '主城区', deadline: '2026-06-15', status: '进行中', company: 'XX通信技术有限公司', time: '2026-04-18' },
+  { id: 3, title: '求购无人机反制系统 3 套', category: '安全设备', budget: '¥30-50万', area: '全市', deadline: '2026-05-20', status: '即将截止', company: 'XX安保服务集团', time: '2026-04-15' },
+  { id: 4, title: '采购 eVTOL 载人飞行器 2 架', category: '飞行器', budget: '¥500万以上', area: '全省', deadline: '2026-08-01', status: '进行中', company: 'XX低空旅游有限公司', time: '2026-04-12' },
+  { id: 5, title: '求购智能停机坪 20 套', category: '基础设施', budget: '¥60-80万', area: '全市', deadline: '2026-07-01', status: '进行中', company: 'XX城市管理运营中心', time: '2026-04-10' },
+  { id: 6, title: '采购飞行模拟训练系统 2 套', category: '培训设备', budget: '¥15-20万', area: '主城区', deadline: '2026-06-30', status: '已完成', company: 'XX飞行培训学校', time: '2026-04-05' }
 ];
 
 var STATUS_MAP: Record<string, { color: string }> = {

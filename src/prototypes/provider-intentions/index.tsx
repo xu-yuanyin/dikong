@@ -19,9 +19,9 @@ var SUPPLY_MENU = [
 ];
 
 var INTENTIONS_DATA = [
-  { key: '1', product: 'DJI Matrice 350 RTK 工业级无人机', customer: '李先生', phone: '13812345678', quantity: 5, budget: '30-40万', status: '待处理', date: '2026-04-22' },
-  { key: '2', product: '大疆 DJI Mavic 3 Enterprise', customer: '张总', phone: '13987654321', quantity: 2, budget: '4-5万', status: '已报价', date: '2026-04-21' },
-  { key: '3', product: '纵横 CW-25 垂直起降固定翼', customer: '王工', phone: '13655556666', quantity: 1, budget: '12万左右', status: '已成交', date: '2026-04-10' }
+  { key: '1', product: 'DJI Matrice 350 RTK 工业级无人机', customer: '李先生', phone: '13812345678', quantity: 5, budget: '¥30-40万', status: '待处理', date: '2026-04-22' },
+  { key: '2', product: '大疆 DJI Mavic 3 Enterprise', customer: '张总', phone: '13987654321', quantity: 2, budget: '¥4-5万', status: '已报价', date: '2026-04-21' },
+  { key: '3', product: '纵横 CW-25 垂直起降固定翼', customer: '王工', phone: '13655556666', quantity: 1, budget: '¥12万左右', status: '已成交', date: '2026-04-10' }
 ];
 
 var Component = function ProviderIntentionsPage() {

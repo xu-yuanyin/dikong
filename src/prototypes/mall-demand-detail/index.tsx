@@ -15,7 +15,7 @@ var DETAIL = {
   title: '求购 10 台工业级测绘无人机',
   category: '飞行器',
   status: '进行中',
-  budget: '50-80万',
+  budget: '¥50-80万',
   area: '全市',
   deadline: '2026-05-31',
   company: 'XX测绘工程有限公司',
