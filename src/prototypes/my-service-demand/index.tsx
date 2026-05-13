@@ -29,11 +29,11 @@ var MENU_ITEMS = [
 ];
 
 var DEMAND_DATA = [
-  { key: '1', title: '需要测绘无人机培训服务', type: '飞行培训', budget: '¥3,000-5,000', area: '主城区', status: '征集中', createDate: '2026-04-20', serviceTime: '2026-05-01 至 2026-05-15', desc: '需要提供5个工作日的封闭式培训' },
-  { key: '2', title: '航拍服务需求（房地产项目）', type: '低空旅游', budget: '¥5,000-8,000', area: '全市', status: '已下线', createDate: '2026-04-10', serviceTime: '2026-04-25 至 2026-04-30', desc: '楼盘宣传片航拍素材收集' },
+  { key: '1', title: '需要测绘无人机培训服务', type: '飞行培训', budget: '¥3,000-5,000', area: '主城区', status: '展示中', createDate: '2026-04-20', serviceTime: '2026-05-01 至 2026-05-15', desc: '需要提供5个工作日的封闭式培训' },
+  { key: '2', title: '航拍服务需求（房地产项目）', type: '低空旅游', budget: '¥5,000-8,000', area: '全市', status: '已关闭', createDate: '2026-04-10', serviceTime: '2026-04-25 至 2026-04-30', desc: '楼盘宣传片航拍素材收集' },
   { key: '3', title: '测试需求发包', type: '飞行器服务', budget: '电议', area: '郊区', status: '违规下架', createDate: '2026-04-18', serviceTime: '随时', desc: '测试使用，无需响应' },
-  { key: '4', title: '电力巡检服务外包', type: '飞行器服务', budget: '¥10,000-15,000', area: '全市', status: '已解决', createDate: '2026-03-15', serviceTime: '2026-04-01 至 2026-04-15', desc: '高压线网日常巡检' },
-  { key: '5', title: '大型活动航拍直播服务', type: '低空旅游', budget: '¥8,000-12,000', area: '主城区', status: '征集中', createDate: '2026-04-25', serviceTime: '2026-05-20', desc: '马拉松赛事全程跟拍直播' }
+  { key: '4', title: '电力巡检服务外包', type: '飞行器服务', budget: '¥10,000-15,000', area: '全市', status: '已关闭', createDate: '2026-03-15', serviceTime: '2026-04-01 至 2026-04-15', desc: '高压线网日常巡检' },
+  { key: '5', title: '大型活动航拍直播服务', type: '低空旅游', budget: '¥8,000-12,000', area: '主城区', status: '展示中', createDate: '2026-04-25', serviceTime: '2026-05-20', desc: '马拉松赛事全程跟拍直播' }
 ];
 
 var handleNavigate = function (key: string) {
@@ -50,29 +50,25 @@ var Component = function MyServiceDemandPage() {
     { title: '服务区域', dataIndex: 'area', key: 'area' },
     { title: '期望服务时间', dataIndex: 'serviceTime', key: 'serviceTime' },
     { title: '状态', dataIndex: 'status', key: 'status', render: function (s: string) { 
-        return <Tag color={s === '征集中' ? 'green' : s === '已解决' ? 'blue' : s === '违规下架' ? 'red' : 'default'}>{s}</Tag>; 
+        return <Tag color={s === '展示中' ? 'green' : s === '违规下架' ? 'red' : 'default'}>{s}</Tag>; 
     }},
     { title: '发布日期', dataIndex: 'createDate', key: 'createDate' },
     { title: '操作', key: 'action', render: function (_: any, record: any) {
       return (
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           <a style={{ color: '#1677ff' }} onClick={function () { handleNavigate('service-demand-detail'); }}>查看</a>
-          {record.status === '征集中' && (
+          {record.status === '展示中' && (
             <>
               <a style={{ color: '#1677ff' }}>编辑</a>
-              <a style={{ color: '#52c41a' }} onClick={function () { message.success('已标记为解决'); }}>标为解决</a>
-              <a style={{ color: '#faad14' }} onClick={function () { message.success('已下线需求'); }}>下线</a>
+              <a style={{ color: '#faad14' }} onClick={function () { message.success('已关闭需求'); }}>关闭需求</a>
             </>
           )}
-          {record.status === '已下线' && (
+          {record.status === '已关闭' && (
             <>
               <a style={{ color: '#1677ff' }}>编辑</a>
               <a style={{ color: '#52c41a' }} onClick={function () { message.success('已重新发布'); }}>重新发布</a>
               <a style={{ color: '#ff4d4f' }} onClick={function () { message.success('已删除'); }}>删除</a>
             </>
-          )}
-          {record.status === '已解决' && (
-            <a style={{ color: '#ff4d4f' }} onClick={function () { message.success('已删除'); }}>删除</a>
           )}
           {record.status === '违规下架' && (
             <>
@@ -151,7 +147,7 @@ var Component = function MyServiceDemandPage() {
             <Card title="我的服务需求" extra={<Button type="primary" icon={<PlusOutlined />} onClick={function () { handleNavigate('demand-publish'); }}>发布需求</Button>} style={{ borderRadius: 12 }}>
               {DEMAND_DATA.filter(function (d) { return d.status === '违规下架'; }).length > 0 && (
                 <div style={{ padding: '8px 16px', background: '#fff2f0', border: '1px solid #ffccc7', borderRadius: 6, marginBottom: 16, color: '#cf1322', fontSize: 13 }}>
-                  系统提示：发现被违规下架的需求，涉嫌违反平台发布规范。如有疑问请致电客服咨询。
+                  系统提示：发现被违规下架的需求，涉嫌违反平台发布规范。如有疑问请致电客服咨询：400-123-4567。
                 </div>
               )}
               <Tabs
@@ -159,9 +155,8 @@ var Component = function MyServiceDemandPage() {
                 onChange={setActiveTab}
                 items={[
                   { key: 'all', label: `全部 (${DEMAND_DATA.length})` },
-                  { key: '征集中', label: `征集中 (${DEMAND_DATA.filter(function (d) { return d.status === '征集中'; }).length})` },
-                  { key: '已解决', label: `已解决 (${DEMAND_DATA.filter(function (d) { return d.status === '已解决'; }).length})` },
-                  { key: '已下线', label: `已下线 (${DEMAND_DATA.filter(function (d) { return d.status === '已下线'; }).length})` },
+                  { key: '展示中', label: `展示中 (${DEMAND_DATA.filter(function (d) { return d.status === '展示中'; }).length})` },
+                  { key: '已关闭', label: `已关闭 (${DEMAND_DATA.filter(function (d) { return d.status === '已关闭'; }).length})` },
                   { key: '违规下架', label: `违规下架 (${DEMAND_DATA.filter(function (d) { return d.status === '违规下架'; }).length})` }
                 ]}
                 style={{ marginBottom: 0 }}
