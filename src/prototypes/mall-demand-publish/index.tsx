@@ -9,7 +9,7 @@ import './style.css';
 
 import React, { useState, useCallback } from 'react';
 import { Card, Form, Input, Select, Button, Breadcrumb, message, Row, Col, DatePicker } from 'antd';
-import { HomeOutlined, FileTextOutlined, ArrowLeftOutlined, PhoneOutlined, UserOutlined, EditOutlined, CompassOutlined } from '@ant-design/icons';
+import { HomeOutlined, FileTextOutlined, ArrowLeftOutlined, PhoneOutlined, UserOutlined, EditOutlined, CompassOutlined, ShoppingOutlined } from '@ant-design/icons';
 
 var PRODUCT_OPTIONS = [
   { value: 'uav', label: '工业级无人机' },
