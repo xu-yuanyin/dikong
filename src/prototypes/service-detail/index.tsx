@@ -8,8 +8,8 @@
 import './style.css';
 
 import React, { useState, useCallback } from 'react';
-import { Card, Tag, Breadcrumb, Divider, Row, Col, Segmented, Rate, Button, message, Modal, Form, Input } from 'antd';
-import { HomeOutlined, ArrowLeftOutlined, FileTextOutlined, FontSizeOutlined, DollarOutlined, ClockCircleOutlined, EnvironmentOutlined, PhoneOutlined, StarOutlined, SafetyCertificateOutlined, CheckCircleOutlined, TeamOutlined, CompassOutlined } from '@ant-design/icons';
+import { Card, Tag, Breadcrumb, Divider, Row, Col, Segmented, Rate, Button, message, Modal, Form, Input, Avatar, List, Progress } from 'antd';
+import { HomeOutlined, ArrowLeftOutlined, FileTextOutlined, FontSizeOutlined, DollarOutlined, ClockCircleOutlined, EnvironmentOutlined, PhoneOutlined, StarOutlined, SafetyCertificateOutlined, CheckCircleOutlined, TeamOutlined, CompassOutlined, UserOutlined, MessageOutlined } from '@ant-design/icons';
 
 var DETAIL = {
   title: '山地物资调运',
@@ -71,6 +71,22 @@ var DETAIL = {
   ]
 };
 
+var REVIEWS = [
+  { id: 1, user: '张先生', rating: 5, date: '2026-04-28', content: '非常专业的服务团队！山区基站建设项目中，无人机吊运效率远超传统人工搬运。飞手操作娴熟，安全措施到位，全程实时图传让我们甲方也能掌握作业进度。强烈推荐！' },
+  { id: 2, user: '李女士', rating: 5, date: '2026-04-15', content: '应急救援场景下使用了他们的物资调运服务，响应速度很快，从接单到飞手到场不到3小时。FlyCart 30 载荷能力确实强悍，一次运了30多公斤的医疗物资上山。' },
+  { id: 3, user: '王经理', rating: 4, date: '2026-03-22', content: '电力线路检修用了两次他们的服务，整体不错。唯一的建议是希望能增加夜间作业能力，有时候紧急抢修等不到天亮。交付的作业报告非常详细规范。' },
+  { id: 4, user: '赵工', rating: 5, date: '2026-03-10', content: '林场物资补给一直是我们的痛点，自从用了无人机调运服务，效率提升了10倍不止。飞手团队很专业，风大的时候主动暂停作业保安全，值得信赖。' },
+  { id: 5, user: '孙总', rating: 4, date: '2026-02-18', content: '施工工地用来运水泥袋上山坡，省了不少人力。价格合理，服务态度也好。就是希望单架次载荷还能再大一些，40公斤有时候还是不太够用。' }
+];
+
+var RATING_DISTRIBUTION = [
+  { star: 5, count: 38 },
+  { star: 4, count: 12 },
+  { star: 3, count: 4 },
+  { star: 2, count: 1 },
+  { star: 1, count: 1 }
+];
+
 var PORTAL_NAV = [
   { key: 'home', label: '首页' },
   { key: 'news', label: '资讯公告' },
@@ -86,6 +102,10 @@ var Component = function ServiceDetailPage() {
   var fontSizeMap: Record<string, number> = { '小': 14, '中': 16, '大': 18 };
   var [orderModalOpen, setOrderModalOpen] = useState(false);
   var [form] = Form.useForm();
+  var [reviewRating, setReviewRating] = useState(5);
+  var [reviewText, setReviewText] = useState('');
+  var [reviews, setReviews] = useState(REVIEWS);
+
   var handleNavigate = useCallback(function (key: string) {
     window.location.href = '/prototypes/' + key;
   }, []);
@@ -205,6 +225,118 @@ var Component = function ServiceDetailPage() {
                   );
                 })}
               </div>
+            </Card>
+
+            {/* ========== 用户评价区域 ========== */}
+            <Card style={{ borderRadius: 12, marginBottom: 24 }} id="reviews-section">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <MessageOutlined style={{ fontSize: 18, color: '#1677ff' }} />
+                  <span style={{ fontSize: 18, fontWeight: 700 }}>用户评价</span>
+                  <Tag color="blue" style={{ marginLeft: 4 }}>{reviews.length} 条评价</Tag>
+                </div>
+              </div>
+
+              {/* 评分概览 */}
+              <div style={{ display: 'flex', gap: 32, marginBottom: 24, padding: 20, background: 'linear-gradient(135deg, #f0f5ff 0%, #e6f4ff 100%)', borderRadius: 12 }}>
+                <div style={{ textAlign: 'center', minWidth: 120 }}>
+                  <div style={{ fontSize: 42, fontWeight: 800, color: '#1677ff', lineHeight: 1 }}>{DETAIL.rating}</div>
+                  <Rate disabled defaultValue={DETAIL.rating} allowHalf style={{ fontSize: 14, marginTop: 8 }} />
+                  <div style={{ fontSize: 12, color: '#8c8c8c', marginTop: 4 }}>{DETAIL.reviewCount} 人评价</div>
+                </div>
+                <div style={{ flex: 1 }}>
+                  {RATING_DISTRIBUTION.map(function (item) {
+                    var total = RATING_DISTRIBUTION.reduce(function (sum, r) { return sum + r.count; }, 0);
+                    var pct = Math.round(item.count / total * 100);
+                    return (
+                      <div key={item.star} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        <span style={{ fontSize: 12, color: '#8c8c8c', minWidth: 32 }}>{item.star} 星</span>
+                        <Progress percent={pct} showInfo={false} strokeColor={item.star >= 4 ? '#1677ff' : item.star === 3 ? '#faad14' : '#ff4d4f'} trailColor="#e8e8e8" style={{ flex: 1, margin: 0 }} size="small" />
+                        <span style={{ fontSize: 12, color: '#8c8c8c', minWidth: 24, textAlign: 'right' }}>{item.count}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 发表评价 */}
+              {!isPreview && (
+              <div style={{ marginBottom: 24, padding: 20, background: '#fafafa', borderRadius: 12, border: '1px dashed #d9d9d9' }}>
+                <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <UserOutlined style={{ color: '#1677ff' }} />
+                  发表评价
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                  <span style={{ fontSize: 13, color: '#595959' }}>服务评分：</span>
+                  <Rate value={reviewRating} onChange={function (v) { setReviewRating(v); }} style={{ fontSize: 20 }} />
+                  <span style={{ fontSize: 13, color: '#faad14', fontWeight: 600 }}>{reviewRating}.0</span>
+                </div>
+                <Input.TextArea
+                  rows={3}
+                  value={reviewText}
+                  onChange={function (e) { setReviewText(e.target.value); }}
+                  placeholder="分享您的服务体验，帮助更多用户了解该服务..."
+                  maxLength={500}
+                  showCount
+                  style={{ marginBottom: 12, borderRadius: 8 }}
+                />
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button
+                    type="primary"
+                    disabled={!reviewText.trim()}
+                    onClick={function () {
+                      var newReview = {
+                        id: Date.now(),
+                        user: '当前用户',
+                        avatar: '',
+                        rating: reviewRating,
+                        date: new Date().toISOString().slice(0, 10),
+                        content: reviewText,
+                        likes: 0,
+                        reply: ''
+                      };
+                      setReviews([newReview].concat(reviews));
+                      setReviewText('');
+                      setReviewRating(5);
+                      message.success('评价发布成功！感谢您的反馈。');
+                    }}
+                    style={{ borderRadius: 6, height: 36, paddingLeft: 24, paddingRight: 24 }}
+                  >
+                    提交评价
+                  </Button>
+                </div>
+              </div>
+              )}
+
+              {/* 评价列表 */}
+              <List
+                itemLayout="vertical"
+                dataSource={reviews}
+                renderItem={function (item) {
+                  return (
+                    <List.Item
+                      key={item.id}
+                      style={{ padding: '16px 0', borderBottom: '1px solid #f0f0f0' }}
+                    >
+                      <div style={{ display: 'flex', gap: 12 }}>
+                        <Avatar size={40} style={{ background: 'linear-gradient(135deg, #1677ff, #4096ff)', flexShrink: 0, fontSize: 16, fontWeight: 600 }}>
+                          {item.user.slice(0, 1)}
+                        </Avatar>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <span style={{ fontSize: 14, fontWeight: 600, color: '#262626' }}>{item.user}</span>
+                              <Rate disabled defaultValue={item.rating} allowHalf style={{ fontSize: 12 }} />
+                            </div>
+                            <span style={{ fontSize: 12, color: '#bfbfbf' }}>{item.date}</span>
+                          </div>
+                          <p style={{ fontSize: 14, color: '#595959', lineHeight: 1.8, margin: '8px 0 0' }}>{item.content}</p>
+                        </div>
+                      </div>
+                    </List.Item>
+                  );
+                }}
+              />
             </Card>
           </Col>
 
