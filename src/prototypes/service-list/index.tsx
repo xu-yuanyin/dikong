@@ -12,7 +12,7 @@ import {
   CompassOutlined, ReadOutlined, EnvironmentOutlined, ToolOutlined, AppstoreOutlined,
   RocketOutlined, ExperimentOutlined, ThunderboltOutlined, CameraOutlined,
   VideoCameraOutlined, TrophyOutlined, SolutionOutlined, SettingOutlined,
-  BulbOutlined, FormOutlined, UserOutlined, ClockCircleOutlined, DollarOutlined
+  BulbOutlined, FormOutlined, UserOutlined, ClockCircleOutlined, DollarOutlined, MoreOutlined
 } from '@ant-design/icons';
 
 const CATEGORIES = [
@@ -21,7 +21,8 @@ const CATEGORIES = [
   { key: '航拍影像', icon: <EnvironmentOutlined />, title: '航拍影像', color: '#722ed1', bg: '#f9f0ff' },
   { key: '飞行培训', icon: <ReadOutlined />, title: '飞行培训', color: '#52c41a', bg: '#f6ffed' },
   { key: '低空旅游', icon: <CompassOutlined />, title: '低空旅游', color: '#1677ff', bg: '#e6f4ff' },
-  { key: '飞行器服务', icon: <ToolOutlined />, title: '飞行器服务', color: '#13c2c2', bg: '#e6fffb' }
+  { key: '飞行器服务', icon: <ToolOutlined />, title: '飞行器服务', color: '#13c2c2', bg: '#e6fffb' },
+  { key: '其他服务', icon: <MoreOutlined />, title: '其他服务', color: '#8c8c8c', bg: '#f5f5f5' }
 ];
 
 const SERVICE_COVERS: Record<number, { gradient: string; icon: React.ReactNode; label: string }> = {
