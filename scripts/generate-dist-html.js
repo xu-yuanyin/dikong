@@ -115,6 +115,14 @@ if (fs.existsSync(srcBootstrap)) {
       console.log(`✓ ${file} 已复制到 dist/assets`);
     }
   }
+
+  // 复制 chunks 目录
+  const srcChunksDir = path.join(adminDir, 'assets', 'chunks');
+  const destChunksDir = path.join(destAssetsDir, 'chunks');
+  if (fs.existsSync(srcChunksDir)) {
+    fs.cpSync(srcChunksDir, destChunksDir, { recursive: true });
+    console.log('✓ chunks 目录已复制到 dist/assets/chunks');
+  }
 } else {
   console.warn('⚠ html-template-bootstrap.js 不存在，请先构建 prototype-admin');
 }
