@@ -122,6 +122,9 @@ var Component = function ServicePublishPage() {
                 </Form.Item>
               </Col>
             </Row>
+            <Form.Item name="coverImage" label="服务封面图" rules={[{ required: true, message: '请上传服务封面图' }]}>
+              <Upload listType="picture-card"><Button icon={<UploadOutlined />}>上传封面</Button></Upload>
+            </Form.Item>
             <Form.Item label={<span><span style={{ color: '#ff4d4f', marginRight: 4 }}>*</span>服务描述</span>}>
               <div style={{ border: '1px solid #d9d9d9', borderRadius: 8, overflow: 'hidden' }}>
                 <div style={{ display: 'flex', gap: 2, padding: '8px 12px', background: '#fafafa', borderBottom: '1px solid #d9d9d9', flexWrap: 'wrap' }}>
