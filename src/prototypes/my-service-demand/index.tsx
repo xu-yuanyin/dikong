@@ -45,7 +45,7 @@ var Component = function MyServiceDemandPage() {
 
   var COLUMNS = [
     { title: '需求标题', dataIndex: 'title', key: 'title', render: function (t: string) { return <a style={{ fontWeight: 500 }} onClick={() => handleNavigate('service-demand-detail')}>{t}</a>; } },
-    { title: '需求类别', dataIndex: 'type', key: 'type', render: function (t: string) { return <Tag color="blue">{t}</Tag>; } },
+    { title: '需求类型', dataIndex: 'type', key: 'type', render: function (t: string) { return <Tag color="blue">{t}</Tag>; } },
     { title: '预算范围', dataIndex: 'budget', key: 'budget', render: function (b: string) { return <span style={{ color: '#ff4d4f', fontWeight: 600 }}>{b}</span>; } },
     { title: '服务区域', dataIndex: 'area', key: 'area' },
     { title: '截止日期', dataIndex: 'deadline', key: 'deadline' },
