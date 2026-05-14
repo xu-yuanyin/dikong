@@ -67,9 +67,9 @@ const DIRECTORY = [
       { key: 'mall-demand', label: '商品需求大厅' },
       { key: 'mall-demand-detail', label: '商品需求详情' },
       { key: 'demand-publish', label: '发布需求' },
-      { key: 'my-demand', label: '我的商品需求' },
+      { key: 'my-demand', label: '我的需求' },
       { key: 'my-intention', label: '发出的采购意向' },
-      { key: 'provider-intentions', label: '收到的采购意向 (商户)' },
+      { key: 'provider-intentions', label: '商品受理单' },
     ]
   },
   {
@@ -83,8 +83,7 @@ const DIRECTORY = [
       { key: 'service-publish', label: '发布服务项目 (服务商)' },
       { key: 'my-service', label: '我的服务 (服务商)' },
       { key: 'service-demand', label: '服务需求大厅' },
-      { key: 'my-service-demand', label: '我的服务需求' },
-      { key: 'provider-orders', label: '收到的服务工单 (服务商)' },
+      { key: 'provider-orders', label: '服务受理单' },
     ]
   },
   {

@@ -408,7 +408,7 @@ var Component = function ServiceDetailPage() {
           <Form.Item name="contactName" label="联系人姓名" rules={[{ required: true, message: '请输入联系人姓名' }]}>
             <Input placeholder="请输入您的姓名" />
           </Form.Item>
-          <Form.Item name="contactPhone" label="联系电话" rules={[{ required: true, message: '请输入联系电话' }]} initialValue="13800138000">
+          <Form.Item name="contactPhone" label="联系电话" rules={[{ required: true, message: '请输入联系电话' }]}>
             <Input placeholder="请输入您的联系电话" />
           </Form.Item>
           <Form.Item name="requirements" label="需求说明 / 备注" rules={[{ required: true, message: '请简述您的需求' }]}>

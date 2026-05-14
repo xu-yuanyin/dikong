@@ -590,9 +590,6 @@ var Component = function HomePage() {
                         >
                           <div style={{ height: 80, background: 'linear-gradient(135deg, #f9f0ff 0%, #e6f4ff 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                             <RocketOutlined style={{ fontSize: 28, color: '#d9d9d9' }} />
-                            {product.tag && (
-                              <Tag color={product.tagColor} style={{ position: 'absolute', top: 6, left: 6, margin: 0, fontSize: 10, lineHeight: '16px', padding: '0 4px', borderRadius: 3 }}>{product.tag}</Tag>
-                            )}
                           </div>
                           <div style={{ padding: '10px 12px' }}>
                             <div style={{ fontSize: 13, fontWeight: 500, color: 'rgba(0,0,0,0.85)', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</div>

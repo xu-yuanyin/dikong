@@ -8,8 +8,8 @@
 import './style.css';
 
 import React, { useState, useCallback } from 'react';
-import { Card, Tag, Breadcrumb, Divider, Row, Col, Descriptions, Button, message, Modal, Form, Input } from 'antd';
-import { HomeOutlined, ArrowLeftOutlined, ShoppingOutlined, DollarOutlined, EnvironmentOutlined, ClockCircleOutlined, TeamOutlined, PhoneOutlined, SafetyCertificateOutlined, UserOutlined } from '@ant-design/icons';
+import { Card, Tag, Breadcrumb, Divider, Row, Col, Descriptions, Button, message } from 'antd';
+import { HomeOutlined, ArrowLeftOutlined, ShoppingOutlined, DollarOutlined, EnvironmentOutlined, ClockCircleOutlined, TeamOutlined, PhoneOutlined, SafetyCertificateOutlined, UserOutlined, FormOutlined, CalendarOutlined } from '@ant-design/icons';
 
 var DETAIL = {
   title: '求购 10 台工业级测绘无人机',
@@ -51,19 +51,9 @@ var PORTAL_NAV = [
 ];
 
 var Component = function MallDemandDetailPage() {
-  var [quoteModalOpen, setQuoteModalOpen] = useState(false);
-  var [form] = Form.useForm();
   var handleNavigate = useCallback(function (key: string) {
     window.location.href = '/prototypes/' + key;
   }, []);
-
-  var handleQuoteSubmit = function () {
-    form.validateFields().then(function (values) {
-      message.success('报价响应已提交！需求方将很快与您线下联系。');
-      setQuoteModalOpen(false);
-      form.resetFields();
-    }).catch(function () {});
-  };
 
   return (
     <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
@@ -129,58 +119,58 @@ var Component = function MallDemandDetailPage() {
                   return <p key={idx} style={{ fontSize: 14, lineHeight: 2, margin: 0 }}>{q}</p>;
                 })}
               </div>
+              <div style={{ background: '#fffbe6', padding: 16, borderRadius: 8, border: '1px solid #ffe58f', marginTop: 16 }}>
+                <div style={{ fontSize: 13, color: '#ad8b00', fontWeight: 500 }}>
+                  <SafetyCertificateOutlined style={{ marginRight: 4 }} />
+                  温馨提示：本平台仅提供采购信息展示服务，具体合作细节与交易请与采购方线下沟通确认。
+                </div>
+              </div>
             </Card>
           </Col>
 
           <Col xs={24} md={7}>
-            <Card style={{ borderRadius: 12, marginBottom: 16 }}>
-              <Button type="primary" size="large" block style={{ height: 48, fontSize: 16, marginBottom: 12, background: '#722ed1', borderColor: '#722ed1' }} onClick={function () { setQuoteModalOpen(true); }}>
-                响应需求 / 提交报价
-              </Button>
-              <Button size="large" block style={{ height: 44 }} onClick={function () { message.info('已收藏该需求'); }}>
-                收藏需求
+            {/* 醒目联系方式卡片 */}
+            <Card style={{ borderRadius: 12, marginBottom: 16, border: '2px solid #722ed1' }}>
+              <div style={{ textAlign: 'center', marginBottom: 16 }}>
+                <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'linear-gradient(135deg, #722ed1, #9254de)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+                  <PhoneOutlined style={{ fontSize: 28, color: '#fff' }} />
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: '#1f1f1f', marginBottom: 4 }}>联系采购方</div>
+                <div style={{ fontSize: 13, color: '#8c8c8c' }}>如您可提供相关商品，请直接联系</div>
+              </div>
+
+              <div style={{ background: '#f9f0ff', padding: 16, borderRadius: 8, marginBottom: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                  <UserOutlined style={{ color: '#722ed1', fontSize: 16 }} />
+                  <span style={{ fontSize: 13, color: '#8c8c8c' }}>联系人</span>
+                </div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#1f1f1f', paddingLeft: 24 }}>{DETAIL.contact}</div>
+              </div>
+
+              <div style={{ background: '#f6ffed', padding: 16, borderRadius: 8, marginBottom: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                  <PhoneOutlined style={{ color: '#52c41a', fontSize: 16 }} />
+                  <span style={{ fontSize: 13, color: '#8c8c8c' }}>联系电话</span>
+                </div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: '#722ed1', paddingLeft: 24, letterSpacing: 1 }}>{DETAIL.phone}</div>
+              </div>
+
+              <Button type="primary" size="large" block style={{ height: 48, fontSize: 16, borderRadius: 8, background: '#722ed1', borderColor: '#722ed1' }} onClick={function () { message.success('已复制联系电话到剪贴板'); }}>
+                复制联系电话
               </Button>
             </Card>
+
             <Card style={{ borderRadius: 12 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>联系方式</div>
-              <div style={{ fontSize: 13, lineHeight: 2, color: '#595959' }}>
-                <div><TeamOutlined style={{ marginRight: 8, color: '#722ed1' }} />{DETAIL.company}</div>
-                <div><UserOutlined style={{ marginRight: 8, color: '#722ed1' }} />{DETAIL.contact}</div>
-                <div><PhoneOutlined style={{ marginRight: 8, color: '#722ed1' }} />{DETAIL.phone}</div>
+              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>采购方信息</div>
+              <div style={{ fontSize: 13, lineHeight: 2.2, color: '#595959' }}>
+                <div><SafetyCertificateOutlined style={{ marginRight: 8, color: '#52c41a' }} />已完成实名认证</div>
+                <div><FormOutlined style={{ marginRight: 8, color: '#722ed1' }} />{DETAIL.company}</div>
+                <div><CalendarOutlined style={{ marginRight: 8, color: '#8c8c8c' }} />发布于 {DETAIL.time}</div>
               </div>
             </Card>
           </Col>
         </Row>
       </div>
-
-      <Modal
-        title="提交报价与响应"
-        open={quoteModalOpen}
-        onCancel={function () { setQuoteModalOpen(false); form.resetFields(); }}
-        footer={null}
-      >
-        <div style={{ marginBottom: 16, color: '#595959' }}>
-          请简要描述您的方案，留下联系方式，需求方确认后将与您线下对接。
-        </div>
-        <Form form={form} layout="vertical">
-          <Form.Item name="company" label="企业名称" rules={[{ required: true, message: '请输入企业名称' }]}>
-            <Input placeholder="请输入您的企业名称" />
-          </Form.Item>
-          <Form.Item name="contact" label="联系人" rules={[{ required: true, message: '请输入联系人姓名' }]}>
-            <Input placeholder="请输入联系人姓名" />
-          </Form.Item>
-          <Form.Item name="phone" label="联系电话" rules={[{ required: true, message: '请输入联系电话' }]}>
-            <Input placeholder="请输入联系电话" />
-          </Form.Item>
-          <Form.Item name="plan" label="初步方案与报价" rules={[{ required: true, message: '请输入初步方案或报价说明' }]}>
-            <Input.TextArea placeholder="请输入您的能提供的产品/服务优势，以及初步报价（选填）" rows={4} />
-          </Form.Item>
-          <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
-            <Button onClick={function () { setQuoteModalOpen(false); }} style={{ marginRight: 8 }}>取消</Button>
-            <Button type="primary" onClick={handleQuoteSubmit}>确认提交</Button>
-          </Form.Item>
-        </Form>
-      </Modal>
     </div>
   );
 };

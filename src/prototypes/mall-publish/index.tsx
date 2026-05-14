@@ -8,7 +8,7 @@
 import './style.css';
 
 import React, { useState, useCallback } from 'react';
-import { Card, Form, Input, Select, Button, Breadcrumb, message, Upload, Row, Col, InputNumber } from 'antd';
+import { Card, Form, Input, Select, Button, Breadcrumb, message, Upload, Row, Col, InputNumber, Checkbox } from 'antd';
 import { HomeOutlined, FileTextOutlined, ShoppingOutlined, UploadOutlined, ArrowLeftOutlined, PhoneOutlined, UserOutlined } from '@ant-design/icons';
 
 var CATEGORIES = [
@@ -70,7 +70,7 @@ var Component = function MallPublishPage() {
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
             <ShoppingOutlined style={{ fontSize: 32, color: '#722ed1', marginBottom: 8 }} />
             <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 4 }}>发布商品</h2>
-            <p style={{ fontSize: 13, color: '#8c8c8c' }}>填写商品信息，提交后等待平台审核</p>
+            <p style={{ fontSize: 13, color: '#8c8c8c' }}>填写商品信息，即可发布商品</p>
           </div>
 
           <Form form={form} layout="vertical">
@@ -134,11 +134,14 @@ var Component = function MallPublishPage() {
             <Form.Item name="license" label="经营许可/资质">
               <Upload listType="text"><Button icon={<UploadOutlined />}>上传经营许可文件</Button></Upload>
             </Form.Item>
+            <Form.Item name="guarantees" label="服务保障">
+              <Checkbox.Group options={['正品保证', '全国联保', '7天无理由退换', '专业安装指导', '免费培训', '终身维护']} />
+            </Form.Item>
             <Form.Item>
               <div style={{ display: 'flex', gap: 12 }}>
                 <Button size="large" onClick={function () { handleNavigate('mall-list'); }}>关闭</Button>
                 <Button type="primary" size="large" style={{ flex: 1, background: '#722ed1', borderColor: '#722ed1' }} onClick={function () {
-                  form.validateFields().then(function () { message.success('商品发布成功，等待审核！'); }).catch(function () {});
+                  form.validateFields().then(function () { message.success('商品发布成功！'); }).catch(function () {});
                 }}>提交发布</Button>
               </div>
             </Form.Item>

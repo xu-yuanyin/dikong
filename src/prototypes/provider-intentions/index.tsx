@@ -1,5 +1,5 @@
 /**
- * @name 收到的采购意向（供给方）
+ * @name 商品受理单（供给方）
  * @mode axure
  */
 
@@ -14,14 +14,14 @@ var SUPPLY_MENU = [
   { key: 'mall-publish', label: '发布商品' },
   { key: 'my-goods', label: '我的商品' },
   { key: 'service-publish', label: '发布服务' },
-  { key: 'provider-orders', label: '收到的服务工单' },
-  { key: 'provider-intentions', label: '收到的采购意向' }
+  { key: 'provider-orders', label: '服务受理单' },
+  { key: 'provider-intentions', label: '商品受理单' }
 ];
 
 var INTENTIONS_DATA = [
-  { key: '1', product: 'DJI Matrice 350 RTK 工业级无人机', customer: '李先生', phone: '13812345678', quantity: 5, budget: '¥30-40万', status: '待处理', date: '2026-04-22' },
-  { key: '2', product: '大疆 DJI Mavic 3 Enterprise', customer: '张总', phone: '13987654321', quantity: 2, budget: '¥4-5万', status: '已报价', date: '2026-04-21' },
-  { key: '3', product: '纵横 CW-25 垂直起降固定翼', customer: '王工', phone: '13655556666', quantity: 1, budget: '¥12万左右', status: '已成交', date: '2026-04-10' }
+  { key: '1', product: 'DJI Matrice 350 RTK 工业级无人机', customer: '李先生', phone: '13812345678', quantity: 5, req: '希望尽快发货，并开具增值税专用发票。', status: '待处理', date: '2026-04-22' },
+  { key: '2', product: '大疆 DJI Mavic 3 Enterprise', customer: '张总', phone: '13987654321', quantity: 2, req: '附带3套备用螺旋桨。', status: '进行中', date: '2026-04-21' },
+  { key: '3', product: '纵横 CW-25 垂直起降固定翼', customer: '王工', phone: '13655556666', quantity: 1, req: '全套标准版，需要现场培训服务。', status: '已完成', date: '2026-04-10' }
 ];
 
 var Component = function ProviderIntentionsPage() {
@@ -30,24 +30,25 @@ var Component = function ProviderIntentionsPage() {
   }, []);
 
   var updateStatus = function (status: string) {
-    message.success(`意向状态已更新为：${status}`);
+    message.success(`预约状态已更新为：${status}`);
   };
 
   var COLUMNS = [
-    { title: '客户意向商品', dataIndex: 'product', key: 'product', render: function (p: string) { return <span style={{ fontWeight: 500, color: '#1677ff' }}>{p}</span>; } },
+    { title: '客户预约商品', dataIndex: 'product', key: 'product', render: function (p: string) { return <span style={{ fontWeight: 500, color: '#1677ff' }}>{p}</span>; } },
     { title: '客户姓名', dataIndex: 'customer', key: 'customer' },
     { title: '联系电话', dataIndex: 'phone', key: 'phone' },
     { title: '采购数量', dataIndex: 'quantity', key: 'quantity' },
-    { title: '期望预算', dataIndex: 'budget', key: 'budget', render: function (b: string) { return <span style={{ color: '#ff4d4f' }}>{b}</span>; } },
+    { title: '需求备注', dataIndex: 'req', key: 'req', width: 250 },
     { title: '提交时间', dataIndex: 'date', key: 'date' },
     { title: '状态', dataIndex: 'status', key: 'status', render: function (s: string) { 
-      return <Tag color={s === '待处理' ? 'orange' : s === '已报价' ? 'blue' : 'green'}>{s}</Tag>; 
+      return <Tag color={s === '待处理' ? 'orange' : s === '进行中' ? 'blue' : s === '待确认' ? 'cyan' : 'green'}>{s}</Tag>; 
     }},
     { title: '操作', key: 'action', render: function (_: any, record: any) {
       return (
         <div style={{ display: 'flex', gap: 8 }}>
-          {record.status === '待处理' && <a onClick={function() { updateStatus('已报价'); }}>标记已报价</a>}
-          {record.status === '已报价' && <a onClick={function() { updateStatus('已成交'); }}>确认成交</a>}
+          {record.status === '待处理' && <a onClick={function() { updateStatus('进行中'); }}>标记为进行中</a>}
+          {record.status === '进行中' && <a onClick={function() { updateStatus('待确认'); }}>提交交付</a>}
+          {record.status === '待确认' && <span style={{ color: '#bfbfbf' }}>等待客户确认</span>}
           <a style={{ color: '#8c8c8c' }}>查看详情</a>
         </div>
       );
@@ -73,7 +74,7 @@ var Component = function ProviderIntentionsPage() {
         <Breadcrumb items={[
           { title: <a onClick={function () { handleNavigate('home'); }}><HomeOutlined /> 首页</a> },
           { title: '服务商后台' },
-          { title: '收到的采购意向' }
+          { title: '商品受理单' }
         ]} style={{ marginBottom: 24 }} />
 
         <Row gutter={24}>
@@ -108,19 +109,23 @@ var Component = function ProviderIntentionsPage() {
             </Card>
           </Col>
           <Col xs={24} md={19}>
-            <Card title="客户提交的采购意向" style={{ borderRadius: 12 }}>
+            <Card title="客户提交的商品受理单" style={{ borderRadius: 12 }}>
               <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
                 <div style={{ padding: '12px 10px', background: '#fff7e6', borderRadius: 8, textAlign: 'center', flex: 1 }}>
                   <div style={{ fontSize: 24, fontWeight: 700, color: '#fa8c16' }}>{INTENTIONS_DATA.filter(function(d) { return d.status === '待处理'; }).length}</div>
                   <div style={{ fontSize: 12, color: '#8c8c8c' }}>待处理</div>
                 </div>
                 <div style={{ padding: '12px 10px', background: '#e6f4ff', borderRadius: 8, textAlign: 'center', flex: 1 }}>
-                  <div style={{ fontSize: 24, fontWeight: 700, color: '#1677ff' }}>{INTENTIONS_DATA.filter(function(d) { return d.status === '已报价'; }).length}</div>
-                  <div style={{ fontSize: 12, color: '#8c8c8c' }}>已报价</div>
+                  <div style={{ fontSize: 24, fontWeight: 700, color: '#1677ff' }}>{INTENTIONS_DATA.filter(function(d) { return d.status === '进行中'; }).length}</div>
+                  <div style={{ fontSize: 12, color: '#8c8c8c' }}>进行中</div>
+                </div>
+                <div style={{ padding: '12px 10px', background: '#e6fffb', borderRadius: 8, textAlign: 'center', flex: 1 }}>
+                  <div style={{ fontSize: 24, fontWeight: 700, color: '#13c2c2' }}>{INTENTIONS_DATA.filter(function(d) { return d.status === '待确认'; }).length}</div>
+                  <div style={{ fontSize: 12, color: '#8c8c8c' }}>待确认</div>
                 </div>
                 <div style={{ padding: '12px 10px', background: '#f6ffed', borderRadius: 8, textAlign: 'center', flex: 1 }}>
-                  <div style={{ fontSize: 24, fontWeight: 700, color: '#52c41a' }}>{INTENTIONS_DATA.filter(function(d) { return d.status === '已成交'; }).length}</div>
-                  <div style={{ fontSize: 12, color: '#8c8c8c' }}>已成交</div>
+                  <div style={{ fontSize: 24, fontWeight: 700, color: '#52c41a' }}>{INTENTIONS_DATA.filter(function(d) { return d.status === '已完成'; }).length}</div>
+                  <div style={{ fontSize: 12, color: '#8c8c8c' }}>已完成</div>
                 </div>
               </div>
               <Table columns={COLUMNS} dataSource={INTENTIONS_DATA} pagination={{ pageSize: 10 }} />

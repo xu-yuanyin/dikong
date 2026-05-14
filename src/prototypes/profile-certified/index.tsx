@@ -15,17 +15,16 @@ var MENU_ITEMS = [
   { key: 'profile-certified', label: '我的信息', group: '账号管理' },
   { key: 'role-management', label: '角色管理' },
   { key: 'message-center', label: '消息中心' },
-  { key: 'my-intention', label: '我的意向', group: '个人/需求方业务' },
-  { key: 'my-service-demand', label: '我的服务需求' },
-  { key: 'my-demand', label: '我的采购需求' },
+  { key: 'my-orders', label: '我的预约', group: '个人/需求方业务' },
+  { key: 'my-demand', label: '我的需求' },
   { key: 'my-aircraft', label: '我的飞行器', group: '飞行服务 (飞手/企业)' },
   { key: 'my-flight-plan', label: '我的飞行计划' },
   { key: 'my-goods', label: '我的商品', group: '低空商城 (商户)' },
   { key: 'mall-publish', label: '发布商品' },
   { key: 'my-service', label: '我的服务', group: '低空服务 (飞行服务商)' },
   { key: 'service-publish', label: '发布服务项目' },
-  { key: 'provider-orders', label: '预约受理单' },
-  { key: 'provider-intentions', label: '收到的意向' }
+  { key: 'provider-orders', label: '服务受理单' },
+  { key: 'provider-intentions', label: '商品受理单' }
 ];
 
 var Component = function ProfileCertifiedPage() {

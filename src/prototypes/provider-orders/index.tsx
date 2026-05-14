@@ -1,5 +1,5 @@
 /**
- * @name 服务商工单管理
+ * @name 服务受理单（供给方）
  * @mode axure
  */
 
@@ -13,17 +13,16 @@ var MENU_ITEMS = [
   { key: 'profile-certified', label: '我的信息', group: '账号管理' },
   { key: 'role-management', label: '角色管理' },
   { key: 'message-center', label: '消息中心' },
-  { key: 'my-intention', label: '我的意向', group: '个人/需求方业务' },
-  { key: 'my-service-demand', label: '我的服务需求' },
-  { key: 'my-demand', label: '我的采购需求' },
+  { key: 'my-orders', label: '我的预约', group: '个人/需求方业务' },
+  { key: 'my-demand', label: '我的需求' },
   { key: 'my-aircraft', label: '我的飞行器', group: '飞行作业台' },
   { key: 'my-flight-plan', label: '我的飞行计划' },
   { key: 'my-service', label: '我的服务管理', group: '低空服务 (供给端)' },
   { key: 'service-publish', label: '发布服务项目' },
-  { key: 'provider-orders', label: '预约受理单' },
+  { key: 'provider-orders', label: '服务受理单' },
   { key: 'my-goods', label: '我的商品', group: '低空商城 (供给端)' },
   { key: 'mall-publish', label: '发布商品' },
-  { key: 'provider-intentions', label: '收到的商城意向' }
+  { key: 'provider-intentions', label: '商品受理单' }
 ];
 
 var ORDER_DATA = [
@@ -88,7 +87,7 @@ var Component = function ProviderOrdersPage() {
         <Breadcrumb items={[
           { title: <a onClick={function () { handleNavigate('home'); }}><HomeOutlined /> 首页</a> },
           { title: '服务商后台' },
-          { title: '预约受理单' }
+          { title: '服务受理单' }
         ]} style={{ marginBottom: 24 }} />
 
         <Row gutter={24}>
@@ -126,7 +125,7 @@ var Component = function ProviderOrdersPage() {
             </Card>
           </Col>
           <Col xs={24} md={19}>
-            <Card title="收到的客户工单" style={{ borderRadius: 12 }}>
+            <Card title="客户提交的服务受理单" style={{ borderRadius: 12 }}>
               <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
                 <div style={{ padding: '12px 10px', background: '#fff7e6', borderRadius: 8, textAlign: 'center', flex: 1 }}>
                   <div style={{ fontSize: 24, fontWeight: 700, color: '#fa8c16' }}>{ORDER_DATA.filter(d => d.status === '待处理').length}</div>

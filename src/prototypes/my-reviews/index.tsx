@@ -5,17 +5,16 @@
 
 import './style.css';
 
-import React, { useCallback } from 'react';
-import { Card, Table, Rate, Button, Breadcrumb, Avatar, Row, Col, message, Popconfirm, Tag, Tooltip } from 'antd';
+import React, { useCallback, useState } from 'react';
+import { Card, Table, Rate, Button, Breadcrumb, Avatar, Row, Col, message, Popconfirm, Tag, Tooltip, Segmented } from 'antd';
 import { HomeOutlined, UserOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 
 var MENU_ITEMS = [
   { key: 'profile-certified', label: '我的信息', group: '账号管理' },
   { key: 'role-management', label: '角色管理' },
   { key: 'message-center', label: '消息中心' },
-  { key: 'my-intention', label: '我的意向', group: '个人/需求方业务' },
-  { key: 'my-service-demand', label: '我的服务需求' },
-  { key: 'my-demand', label: '我的采购需求' },
+  { key: 'my-orders', label: '我的预约', group: '个人/需求方业务' },
+  { key: 'my-demand', label: '我的需求' },
   { key: 'my-reviews', label: '我的评价' },
   { key: 'my-aircraft', label: '我的飞行器', group: '飞行服务 (飞手/企业)' },
   { key: 'my-flight-plan', label: '我的飞行计划' },
@@ -23,8 +22,8 @@ var MENU_ITEMS = [
   { key: 'mall-publish', label: '发布商品' },
   { key: 'my-service', label: '我的服务', group: '低空服务 (飞行服务商)' },
   { key: 'service-publish', label: '发布服务项目' },
-  { key: 'provider-orders', label: '预约受理单' },
-  { key: 'provider-intentions', label: '收到的意向' }
+  { key: 'provider-orders', label: '服务受理单' },
+  { key: 'provider-intentions', label: '商品受理单' }
 ];
 
 var REVIEWS_DATA = [
@@ -57,7 +56,29 @@ var REVIEWS_DATA = [
   }
 ];
 
+var MALL_REVIEWS_DATA = [
+  {
+    key: '1',
+    productName: '工业级无人机 DJI Matrice 350 RTK',
+    supplier: 'XX无人机专营店',
+    rating: 5,
+    content: '设备性能稳定，全向避障功能非常实用，大大提升了我们在复杂环境下的作业安全性。',
+    date: '2026-05-10',
+    reply: ''
+  },
+  {
+    key: '2',
+    productName: '无人机载荷云台 Zenmuse H20T',
+    supplier: '大疆通用航空服务（郑州）有限公司',
+    rating: 4,
+    content: '热成像效果清晰，测温精准，是巡检的得力助手。唯一缺点是价格偏高。',
+    date: '2026-04-18',
+    reply: '感谢您的评价！高质量的传感器成本较高，我们将努力提供更多优惠活动。'
+  }
+];
+
 var Component = function MyReviewsPage() {
+  var [reviewType, setReviewType] = useState('服务评价');
   var handleNavigate = useCallback(function (key: string) {
     window.location.href = '/prototypes/' + key;
   }, []);
@@ -98,6 +119,74 @@ var Component = function MyReviewsPage() {
             {record.reply && (
               <div style={{ background: '#f5f5f5', padding: '6px 10px', borderRadius: 4, marginTop: 8, fontSize: 12, color: '#8c8c8c', borderLeft: '2px solid #d9d9d9' }}>
                 <span style={{ color: '#1677ff' }}>服务商回复：</span>{record.reply}
+              </div>
+            )}
+          </div>
+        );
+      }
+    },
+    {
+      title: '评价时间',
+      dataIndex: 'date',
+      key: 'date',
+      width: '15%',
+      render: function (d: string) { return <span style={{ color: '#8c8c8c', fontSize: 13 }}>{d}</span>; }
+    },
+    {
+      title: '操作',
+      key: 'action',
+      width: '15%',
+      render: function () {
+        return (
+          <Popconfirm
+            title="确定要删除这条评价吗？"
+            onConfirm={function () { message.success('评价已删除'); }}
+            okText="确定"
+            cancelText="取消"
+          >
+            <a style={{ color: '#ff4d4f' }}>删除评价</a>
+          </Popconfirm>
+        );
+      }
+    }
+  ];
+
+  var mallColumns = [
+    {
+      title: '商品名称',
+      dataIndex: 'productName',
+      key: 'productName',
+      width: '20%',
+      render: function (t: string, record: any) {
+        return (
+          <div>
+            <a style={{ fontWeight: 600, fontSize: 14 }} onClick={function () { handleNavigate('mall-detail'); }}>{t}</a>
+            <div style={{ fontSize: 12, color: '#8c8c8c', marginTop: 4 }}>供应商：{record.supplier}</div>
+          </div>
+        );
+      }
+    },
+    {
+      title: '评分',
+      dataIndex: 'rating',
+      key: 'rating',
+      width: '15%',
+      render: function (r: number) {
+        return <Rate disabled defaultValue={r} style={{ fontSize: 14 }} />;
+      }
+    },
+    {
+      title: '评价内容',
+      dataIndex: 'content',
+      key: 'content',
+      width: '35%',
+      render: function (c: string, record: any) {
+        return (
+          <div>
+            <div style={{ color: '#595959', fontSize: 13, lineHeight: 1.6 }}>{c}</div>
+            {record.reply && (
+              <div style={{ background: '#f5f5f5', padding: '6px 10px', borderRadius: 4, marginTop: 8, fontSize: 12, color: '#8c8c8c', borderLeft: '2px solid #d9d9d9' }}>
+                <span style={{ color: '#1677ff' }}>供应商回复：</span>{record.reply}
               </div>
             )}
           </div>
@@ -192,10 +281,22 @@ var Component = function MyReviewsPage() {
             </Card>
           </Col>
           <Col xs={24} md={18}>
-            <Card title="我的评价" style={{ borderRadius: 12 }}>
+            <Card 
+              title={
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>我的评价</span>
+                  <Segmented 
+                    options={['服务评价', '商品评价']} 
+                    value={reviewType} 
+                    onChange={function(v) { setReviewType(v as string); }} 
+                  />
+                </div>
+              } 
+              style={{ borderRadius: 12 }}
+            >
               <Table 
-                columns={columns} 
-                dataSource={REVIEWS_DATA} 
+                columns={reviewType === '服务评价' ? columns : mallColumns} 
+                dataSource={reviewType === '服务评价' ? REVIEWS_DATA : MALL_REVIEWS_DATA} 
                 pagination={{ pageSize: 5 }} 
               />
             </Card>

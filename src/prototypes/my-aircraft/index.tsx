@@ -16,8 +16,8 @@ var MENU_ITEMS = [
   { key: 'my-aircraft', label: '我的飞行器' },
   { key: 'my-flight-plan', label: '我的飞行计划' },
   { key: 'my-service', label: '我的服务' },
-  { key: 'my-intention', label: '我的采购意向' },
-  { key: 'my-service-demand', label: '我的需求' }
+  { key: 'my-orders', label: '我的预约' },
+  
 ];
 
 var FILED_COLUMNS = [

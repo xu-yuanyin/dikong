@@ -8,21 +8,19 @@
 import './style.css';
 
 import React, { useState, useCallback } from 'react';
-import { Card, Tag, Breadcrumb, Divider, Row, Col, Rate, Button, Segmented, message, Modal } from 'antd';
-import { HomeOutlined, ArrowLeftOutlined, FileTextOutlined, ShoppingOutlined, ShoppingCartOutlined, SafetyCertificateOutlined, CheckCircleOutlined, TeamOutlined, PhoneOutlined, EnvironmentOutlined, StarOutlined } from '@ant-design/icons';
+import { Card, Tag, Breadcrumb, Divider, Row, Col, Rate, Button, Segmented, message, Modal, Form, Input, Avatar, List, Progress, InputNumber } from 'antd';
+import { HomeOutlined, ArrowLeftOutlined, FileTextOutlined, ShoppingOutlined, ShoppingCartOutlined, SafetyCertificateOutlined, CheckCircleOutlined, TeamOutlined, PhoneOutlined, EnvironmentOutlined, StarOutlined, MessageOutlined, UserOutlined } from '@ant-design/icons';
 
 var DETAIL = {
   title: '工业级无人机 DJI Matrice 350 RTK',
   category: '飞行器',
   price: '¥68,800',
-  originalPrice: '¥72,000',
-  sales: 326,
+  stock: 50,
   brand: '大疆创新',
   model: 'Matrice 350 RTK',
   supplier: 'XX无人机专营店',
   contactPerson: '李经理',
   contactPhone: '400-888-9999',
-  highlight: '热销',
   desc: 'DJI Matrice 350 RTK 是大疆推出的旗舰级工业无人机平台，搭载全向避障和精准定位系统，续航长达 55 分钟，广泛应用于测绘、巡检、安防等专业领域。',
   specs: [
     { key: '飞行器重量', value: '6.47 kg（含桨叶和电池）' },
@@ -34,29 +32,24 @@ var DETAIL = {
     { key: '定位精度', value: 'RTK：1 cm + 1 ppm（水平）' },
     { key: '最大飞行速度', value: '23 m/s（运动模式）' }
   ],
-  content: [
-    '产品概述',
-    'DJI Matrice 350 RTK 是新一代旗舰级飞行平台，专为航空测绘、电力巡检、应急救援等专业应用设计。采用全新动力系统和电池技术，续航时间提升至 55 分钟，搭载全向视觉感知和六向避障系统，确保飞行安全。',
-    '',
-    '核心优势',
-    '一、超长续航：全新 TB65 智能飞行电池，支持 400 次循环充电，续航长达 55 分钟。',
-    '二、精准定位：内置 RTK 厘米级定位模块，支持 NTRIP 和 CORS 网络差分，满足高精度测绘需求。',
-    '三、智能避障：全向视觉感知 + 红外传感器，六向环境感知，全自主避障。',
-    '四、多负载支持：支持同时挂载 3 个负载（上置 + 下置 × 2），灵活搭配禅思 H20T、L2 等专业负载。',
-    '',
-    '应用场景',
-    '· 电力线路巡检：搭配禅思 H20T 热成像相机，实现杆塔精细化巡检',
-    '· 航空摄影测量：搭配禅思 P1 全画幅相机，高效完成大面积测绘任务',
-    '· 激光雷达扫描：搭配禅思 L2 激光雷达，快速获取高精度三维点云',
-    '· 应急救援：搭配喊话器、照明灯、抛投器等救援负载',
-    '',
-    '售后服务',
-    '· 整机质保 12 个月，电池质保 200 次循环或 6 个月',
-    '· 全国 50+ 授权维修中心，7×24 小时技术支持',
-    '· 提供飞行培训课程（额外收费）',
-    '· 支持以旧换新服务'
-  ]
+  guarantees: ['正品保证', '全国联保', '7天无理由退换', '专业安装指导'],
+  rating: 4.8,
+  reviewCount: 56
 };
+
+var REVIEWS = [
+  { id: 1, user: '王先生', rating: 5, date: '2026-05-10', content: '设备性能稳定，全向避障功能非常实用，大大提升了我们在复杂环境下的作业安全性。' },
+  { id: 2, user: '李工', rating: 5, date: '2026-04-22', content: '续航能力确实强悍，带满载荷也能飞将近50分钟。卖家发货速度很快，包装严实。' },
+  { id: 3, user: '赵总', rating: 4, date: '2026-04-05', content: '机器很不错，就是电池稍微有点重。配套的遥控器图传距离很远，总体满意。' }
+];
+
+var RATING_DISTRIBUTION = [
+  { star: 5, count: 42 },
+  { star: 4, count: 12 },
+  { star: 3, count: 2 },
+  { star: 2, count: 0 },
+  { star: 1, count: 0 }
+];
 
 var PORTAL_NAV = [
   { key: 'home', label: '首页' },
@@ -69,9 +62,12 @@ var PORTAL_NAV = [
 ];
 
 var Component = function MallDetailPage() {
-  var [fontSize, setFontSize] = useState<string>('中');
   var [isLoggedIn, setIsLoggedIn] = useState(false);
-  var fontSizeMap: Record<string, number> = { '小': 14, '中': 16, '大': 18 };
+  var [reviewRating, setReviewRating] = useState(5);
+  var [reviewText, setReviewText] = useState('');
+  var [reviews, setReviews] = useState(REVIEWS);
+  var [intentionModalOpen, setIntentionModalOpen] = useState(false);
+  var [form] = Form.useForm();
   var handleNavigate = useCallback(function (key: string) {
     window.location.href = '/prototypes/' + key;
   }, []);
@@ -119,15 +115,10 @@ var Component = function MallDetailPage() {
                 <a onClick={function () { handleNavigate('mall-list'); }} style={{ color: '#722ed1', cursor: 'pointer', fontSize: 13 }}>
                   <ArrowLeftOutlined /> 返回商城
                 </a>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 12, color: '#8c8c8c' }}>字号</span>
-                  <Segmented options={['小', '中', '大']} value={fontSize} onChange={function (v) { setFontSize(v as string); }} size="small" />
-                </div>
               </div>
 
               <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
                 <Tag color="purple">{DETAIL.category}</Tag>
-                <Tag color="red">{DETAIL.highlight}</Tag>
               </div>
 
               <h1 style={{ fontSize: 22, fontWeight: 700, lineHeight: 1.4, marginBottom: 12 }}>{DETAIL.title}</h1>
@@ -135,12 +126,11 @@ var Component = function MallDetailPage() {
               <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', fontSize: 13, color: '#8c8c8c', marginBottom: 16 }}>
                 <span>品牌：{DETAIL.brand}</span>
                 <span>型号：{DETAIL.model}</span>
-                <span>已售 {DETAIL.sales}</span>
+                <span>库存：{DETAIL.stock}</span>
               </div>
 
               <div style={{ background: '#fff7e6', padding: 16, borderRadius: 8, marginBottom: 16, borderLeft: '4px solid #fa8c16' }}>
-                <span style={{ fontSize: 24, fontWeight: 700, color: '#ff4d4f', marginRight: 12 }}>{DETAIL.price}</span>
-                <span style={{ fontSize: 14, color: '#8c8c8c', textDecoration: 'line-through' }}>{DETAIL.originalPrice}</span>
+                <span style={{ fontSize: 24, fontWeight: 700, color: '#ff4d4f' }}>{DETAIL.price}</span>
                 <p style={{ fontSize: 14, color: '#595959', lineHeight: 1.8, margin: '8px 0 0' }}>{DETAIL.desc}</p>
               </div>
 
@@ -187,29 +177,120 @@ var Component = function MallDetailPage() {
                 })}
               </Row>
 
-              <Divider>详细介绍</Divider>
-              <div style={{ fontSize: fontSizeMap[fontSize], lineHeight: 1.8 }}>
-                {DETAIL.content.map(function (line, idx) {
-                  if (!line) return <div key={idx} style={{ height: 12 }} />;
-                  var isTitle = /^产品概述|核心优势|应用场景|售后服务$/.test(line);
-                  var isSection = /^[一二三四五六]/.test(line);
-                  return (
-                    <p key={idx} style={{ margin: 0, marginBottom: 4, fontWeight: isTitle ? 600 : 400, fontSize: isTitle ? fontSizeMap[fontSize] + 2 : fontSizeMap[fontSize] }}>
-                      {line}
-                    </p>
-                  );
-                })}
+            </Card>
+
+            {/* ========== 用户评价区域 ========== */}
+            <Card style={{ borderRadius: 12, marginBottom: 24 }} id="reviews-section">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <MessageOutlined style={{ fontSize: 18, color: '#722ed1' }} />
+                  <span style={{ fontSize: 18, fontWeight: 700 }}>用户评价</span>
+                  <Tag color="purple" style={{ marginLeft: 4 }}>{reviews.length} 条评价</Tag>
+                </div>
               </div>
+
+              {/* 评分概览 */}
+              <div style={{ display: 'flex', gap: 32, marginBottom: 24, padding: 20, background: 'linear-gradient(135deg, #f9f0ff 0%, #f0f5ff 100%)', borderRadius: 12 }}>
+                <div style={{ textAlign: 'center', minWidth: 120 }}>
+                  <div style={{ fontSize: 42, fontWeight: 800, color: '#722ed1', lineHeight: 1 }}>{DETAIL.rating}</div>
+                  <Rate disabled defaultValue={DETAIL.rating} allowHalf style={{ fontSize: 14, marginTop: 8 }} />
+                  <div style={{ fontSize: 12, color: '#8c8c8c', marginTop: 4 }}>{DETAIL.reviewCount} 人评价</div>
+                </div>
+                <div style={{ flex: 1 }}>
+                  {RATING_DISTRIBUTION.map(function (item) {
+                    var total = RATING_DISTRIBUTION.reduce(function (sum, r) { return sum + r.count; }, 0);
+                    var pct = Math.round(item.count / total * 100);
+                    return (
+                      <div key={item.star} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        <span style={{ fontSize: 12, color: '#8c8c8c', minWidth: 32 }}>{item.star} 星</span>
+                        <Progress percent={pct} showInfo={false} strokeColor={item.star >= 4 ? '#722ed1' : item.star === 3 ? '#faad14' : '#ff4d4f'} trailColor="#e8e8e8" style={{ flex: 1, margin: 0 }} size="small" />
+                        <span style={{ fontSize: 12, color: '#8c8c8c', minWidth: 24, textAlign: 'right' }}>{item.count}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 发表评价 */}
+              <div style={{ marginBottom: 24, padding: 20, background: '#fafafa', borderRadius: 12, border: '1px dashed #d9d9d9' }}>
+                <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <UserOutlined style={{ color: '#722ed1' }} />
+                  发表评价
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                  <span style={{ fontSize: 13, color: '#595959' }}>商品评分：</span>
+                  <Rate value={reviewRating} onChange={function (v) { setReviewRating(v); }} style={{ fontSize: 20 }} />
+                  <span style={{ fontSize: 13, color: '#faad14', fontWeight: 600 }}>{reviewRating}.0</span>
+                </div>
+                <Input.TextArea
+                  rows={3}
+                  value={reviewText}
+                  onChange={function (e) { setReviewText(e.target.value); }}
+                  placeholder="分享您的商品体验，帮助更多用户了解该商品..."
+                  maxLength={500}
+                  showCount
+                  style={{ marginBottom: 12, borderRadius: 8 }}
+                />
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button
+                    type="primary"
+                    disabled={!reviewText.trim()}
+                    onClick={function () {
+                      var newReview = {
+                        id: Date.now(),
+                        user: '当前用户',
+                        rating: reviewRating,
+                        date: new Date().toISOString().slice(0, 10),
+                        content: reviewText
+                      };
+                      setReviews([newReview].concat(reviews));
+                      setReviewText('');
+                      setReviewRating(5);
+                      message.success('评价发布成功！感谢您的反馈。');
+                    }}
+                    style={{ borderRadius: 6, height: 36, paddingLeft: 24, paddingRight: 24, background: '#722ed1', borderColor: '#722ed1' }}
+                  >
+                    提交评价
+                  </Button>
+                </div>
+              </div>
+
+              {/* 评价列表 */}
+              <List
+                itemLayout="vertical"
+                dataSource={reviews}
+                renderItem={function (item) {
+                  return (
+                    <List.Item
+                      key={item.id}
+                      style={{ padding: '16px 0', borderBottom: '1px solid #f0f0f0' }}
+                    >
+                      <div style={{ display: 'flex', gap: 12 }}>
+                        <Avatar size={40} style={{ background: 'linear-gradient(135deg, #d3adf7, #722ed1)', flexShrink: 0, fontSize: 16, fontWeight: 600 }}>
+                          {item.user.slice(0, 1)}
+                        </Avatar>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <span style={{ fontSize: 14, fontWeight: 600, color: '#262626' }}>{item.user}</span>
+                              <Rate disabled defaultValue={item.rating} allowHalf style={{ fontSize: 12 }} />
+                            </div>
+                            <span style={{ fontSize: 12, color: '#bfbfbf' }}>{item.date}</span>
+                          </div>
+                          <p style={{ fontSize: 14, color: '#595959', lineHeight: 1.8, margin: '8px 0 0' }}>{item.content}</p>
+                        </div>
+                      </div>
+                    </List.Item>
+                  );
+                }}
+              />
             </Card>
           </Col>
 
           <Col xs={24} md={7}>
             <Card style={{ borderRadius: 12, marginBottom: 16 }}>
-              <Button type="primary" size="large" block style={{ height: 48, fontSize: 16, marginBottom: 12, background: '#722ed1', borderColor: '#722ed1' }} onClick={function () { requireLogin(function () { handleNavigate('mall-intention'); }); }}>
-                提交采购意向
-              </Button>
-              <Button size="large" block style={{ height: 44 }} onClick={function () { requireLogin(function () { message.info('已收藏该商品'); }); }}>
-                收藏商品
+              <Button type="primary" size="large" block style={{ height: 48, fontSize: 16, background: '#722ed1', borderColor: '#722ed1' }} onClick={function () { setIntentionModalOpen(true); }}>
+                预约购买
               </Button>
             </Card>
             <Card style={{ borderRadius: 12, marginBottom: 16 }}>
@@ -230,18 +311,54 @@ var Component = function MallDetailPage() {
                 </div>
               </div>
             </Card>
-            <Card style={{ borderRadius: 12 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>服务保障</div>
-              <div style={{ fontSize: 13, color: '#595959', lineHeight: 2 }}>
-                <div><CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />正品保证</div>
-                <div><CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />全国联保</div>
-                <div><CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />7天无理由退换</div>
-                <div><CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />专业安装指导</div>
-              </div>
-            </Card>
+            {DETAIL.guarantees && DETAIL.guarantees.length > 0 && (
+              <Card style={{ borderRadius: 12 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>服务保障</div>
+                <div style={{ fontSize: 13, color: '#595959', lineHeight: 2 }}>
+                  {DETAIL.guarantees.map(function(g, i) {
+                    return <div key={i}><CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />{g}</div>;
+                  })}
+                </div>
+              </Card>
+            )}
           </Col>
         </Row>
       </div>
+
+      <Modal
+        title="预约购买"
+        open={intentionModalOpen}
+        onCancel={function () { setIntentionModalOpen(false); }}
+        footer={[
+          <Button key="back" onClick={function () { setIntentionModalOpen(false); }}>取消</Button>,
+          <Button key="submit" type="primary" style={{ background: '#722ed1', borderColor: '#722ed1' }} onClick={function () {
+            form.validateFields().then(function () {
+              message.success('您的预约已提交！商家将尽快与您联系。');
+              setIntentionModalOpen(false);
+              form.resetFields();
+            });
+          }}>提交预约</Button>
+        ]}
+      >
+        <div style={{ marginBottom: 16, padding: 12, background: '#f9f0ff', borderRadius: 8, color: '#722ed1', fontSize: 13, border: '1px solid #d3adf7' }}>
+          提交后，商家将收到您的联系方式并与您对接，具体采购细节与费用将由双方线下确认。
+        </div>
+        <Form form={form} layout="vertical">
+          <Form.Item name="quantity" label="采购数量" rules={[{ required: true, message: '请输入采购数量' }]} initialValue={1}>
+            <InputNumber min={1} style={{ width: '100%' }} placeholder="请输入采购数量" />
+          </Form.Item>
+          <Form.Item name="contactName" label="联系人姓名" rules={[{ required: true, message: '请输入联系人姓名' }]}>
+            <Input placeholder="请输入您的姓名" />
+          </Form.Item>
+          <Form.Item name="contactPhone" label="联系电话" rules={[{ required: true, message: '请输入联系电话' }]}>
+            <Input placeholder="请输入您的联系电话" />
+          </Form.Item>
+          <Form.Item name="requirements" label="采购需求说明 / 备注" rules={[{ required: true, message: '请简述您的需求' }]}>
+            <Input.TextArea rows={4} placeholder="例如：希望尽快发货，或有特殊的技术参数要求等。" />
+          </Form.Item>
+        </Form>
+      </Modal>
+
     </div>
   );
 };
