@@ -353,7 +353,7 @@ var Component = function MallDetailPage() {
           <Form.Item name="contactPhone" label="联系电话" rules={[{ required: true, message: '请输入联系电话' }]}>
             <Input placeholder="请输入您的联系电话" />
           </Form.Item>
-          <Form.Item name="requirements" label="采购需求说明 / 备注" rules={[{ required: true, message: '请简述您的需求' }]}>
+          <Form.Item name="requirements" label="需求备注" rules={[{ required: true, message: '请简述您的需求' }]}>
             <Input.TextArea rows={4} placeholder="例如：希望尽快发货，或有特殊的技术参数要求等。" />
           </Form.Item>
         </Form>

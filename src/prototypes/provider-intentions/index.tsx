@@ -7,21 +7,29 @@ import './style.css';
 
 import React, { useState, useCallback } from 'react';
 import { Card, Table, Tag, Breadcrumb, Avatar, Row, Col, message } from 'antd';
-import { HomeOutlined, SafetyCertificateOutlined, TeamOutlined } from '@ant-design/icons';
+import { HomeOutlined, SafetyCertificateOutlined, TeamOutlined, CopyOutlined } from '@ant-design/icons';
 
-var SUPPLY_MENU = [
-  { key: 'profile', label: '企业信息' },
-  { key: 'mall-publish', label: '发布商品' },
-  { key: 'my-goods', label: '我的商品' },
-  { key: 'service-publish', label: '发布服务' },
+var MENU_ITEMS = [
+  { key: 'profile-certified', label: '我的信息', group: '账号管理' },
+  { key: 'role-management', label: '角色管理' },
+  { key: 'message-center', label: '消息中心' },
+  { key: 'my-orders', label: '我的预约', group: '个人/需求方业务' },
+  { key: 'my-demand', label: '我的需求' },
+  { key: 'my-aircraft', label: '我的飞行器', group: '飞行作业台' },
+  { key: 'my-flight-plan', label: '我的飞行计划' },
+  { key: 'my-service', label: '我的服务管理', group: '低空服务 (供给端)' },
+  { key: 'service-publish', label: '发布服务项目' },
   { key: 'provider-orders', label: '服务受理单' },
+  { key: 'my-goods', label: '我的商品', group: '低空商城 (供给端)' },
+  { key: 'mall-publish', label: '发布商品' },
   { key: 'provider-intentions', label: '商品受理单' }
 ];
 
 var INTENTIONS_DATA = [
   { key: '1', product: 'DJI Matrice 350 RTK 工业级无人机', customer: '李先生', phone: '13812345678', quantity: 5, req: '希望尽快发货，并开具增值税专用发票。', status: '待处理', date: '2026-04-22' },
   { key: '2', product: '大疆 DJI Mavic 3 Enterprise', customer: '张总', phone: '13987654321', quantity: 2, req: '附带3套备用螺旋桨。', status: '进行中', date: '2026-04-21' },
-  { key: '3', product: '纵横 CW-25 垂直起降固定翼', customer: '王工', phone: '13655556666', quantity: 1, req: '全套标准版，需要现场培训服务。', status: '已完成', date: '2026-04-10' }
+  { key: '3', product: '道通 EVO Lite+ 航拍无人机', customer: '赵经理', phone: '13700009999', quantity: 3, req: '已付款，请确认发货时间。', status: '待确认', date: '2026-04-15' },
+  { key: '4', product: '纵横 CW-25 垂直起降固定翼', customer: '王工', phone: '13655556666', quantity: 1, req: '全套标准版，需要现场培训服务。', status: '已完成', date: '2026-04-10' }
 ];
 
 var Component = function ProviderIntentionsPage() {
@@ -29,14 +37,20 @@ var Component = function ProviderIntentionsPage() {
     window.location.href = '/prototypes/' + key;
   }, []);
 
+  var copyPhone = function (phone: string) {
+    message.success(`已复制手机号：${phone}`);
+  };
+
   var updateStatus = function (status: string) {
-    message.success(`预约状态已更新为：${status}`);
+    message.success(`工单状态已更新为：${status}`);
   };
 
   var COLUMNS = [
-    { title: '客户预约商品', dataIndex: 'product', key: 'product', render: function (p: string) { return <span style={{ fontWeight: 500, color: '#1677ff' }}>{p}</span>; } },
-    { title: '客户姓名', dataIndex: 'customer', key: 'customer' },
-    { title: '联系电话', dataIndex: 'phone', key: 'phone' },
+    { title: '商品名称', dataIndex: 'product', key: 'product', render: function (p: string) { return <span style={{ fontWeight: 500, color: '#1677ff' }}>{p}</span>; } },
+    { title: '联系人', dataIndex: 'customer', key: 'customer' },
+    { title: '联系电话', dataIndex: 'phone', key: 'phone', render: function (p: string) { 
+      return <span>{p} <CopyOutlined style={{ color: '#1677ff', cursor: 'pointer', marginLeft: 4 }} onClick={() => copyPhone(p)} /></span>; 
+    }},
     { title: '采购数量', dataIndex: 'quantity', key: 'quantity' },
     { title: '需求备注', dataIndex: 'req', key: 'req', width: 250 },
     { title: '提交时间', dataIndex: 'date', key: 'date' },
@@ -86,22 +100,25 @@ var Component = function ProviderIntentionsPage() {
                 <Tag color="blue" style={{ marginTop: 8 }}>已认证供应商</Tag>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {SUPPLY_MENU.map(function (item) {
+                {MENU_ITEMS.map(function (item) {
                   return (
-                    <div
-                      key={item.key}
-                      onClick={function () { if (item.key !== 'provider-intentions') handleNavigate(item.key); }}
-                      style={{
-                        padding: '10px 16px',
-                        borderRadius: 8,
-                        cursor: 'pointer',
-                        background: item.key === 'provider-intentions' ? '#e6f4ff' : 'transparent',
-                        color: item.key === 'provider-intentions' ? '#1677ff' : '#595959',
-                        fontWeight: item.key === 'provider-intentions' ? 600 : 400,
-                        fontSize: 14
-                      }}
-                    >
-                      {item.label}
+                    <div key={item.key}>
+                      {item.group ? <div style={{ fontSize: 11, color: '#bfbfbf', padding: '8px 16px 4px', fontWeight: 600, letterSpacing: 1 }}>{item.group}</div> : null}
+                      <div
+                        onClick={function () { if (item.key !== 'provider-intentions') handleNavigate(item.key); }}
+                        style={{
+                          padding: '10px 16px',
+                          borderRadius: 8,
+                          cursor: 'pointer',
+                          background: item.key === 'provider-intentions' ? '#e6f4ff' : 'transparent',
+                          color: item.key === 'provider-intentions' ? '#1677ff' : '#595959',
+                          fontWeight: item.key === 'provider-intentions' ? 600 : 400,
+                          fontSize: 14,
+                          marginBottom: 4
+                        }}
+                      >
+                        {item.label}
+                      </div>
                     </div>
                   );
                 })}

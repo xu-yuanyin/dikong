@@ -115,10 +115,10 @@ var Component = function MyOrdersPage() {
 
   var PRODUCT_COLUMNS = [
     { title: '预约单号', dataIndex: 'orderNo', key: 'orderNo', render: (t: string) => <span style={{ color: '#8c8c8c' }}>{t}</span> },
-    { title: '关联商品', dataIndex: 'product', key: 'product', render: function (p: string) { return <a style={{ fontWeight: 500 }} onClick={function () { handleNavigate('mall-detail'); }}>{p}</a>; } },
-    { title: '商品类型', dataIndex: 'category', key: 'category', render: function (t: string) { return <Tag color="purple">{t}</Tag>; } },
+    { title: '商品名称', dataIndex: 'product', key: 'product', render: function (p: string) { return <a style={{ fontWeight: 500 }} onClick={function () { handleNavigate('mall-detail'); }}>{p}</a>; } },
+    { title: '商品类别', dataIndex: 'category', key: 'category', render: function (t: string) { return <Tag color="purple">{t}</Tag>; } },
     { title: '采购数量', dataIndex: 'quantity', key: 'quantity' },
-    { title: '预估单价', dataIndex: 'price', key: 'price', render: (p: string) => <span style={{ color: '#ff4d4f', fontWeight: 600 }}>{p}</span> },
+    { title: '售价', dataIndex: 'price', key: 'price', render: (p: string) => <span style={{ color: '#ff4d4f', fontWeight: 600 }}>{p}</span> },
     { title: '供应商', dataIndex: 'provider', key: 'provider' },
     { title: '提交时间', dataIndex: 'bookDate', key: 'bookDate' },
     { title: '状态', dataIndex: 'status', key: 'status', render: function (s: string) { return <Tag color={STATUS_MAP[s].color}>{s}</Tag>; } },
@@ -299,7 +299,7 @@ var Component = function MyOrdersPage() {
               {detailRecord.isProduct ? (
                 <>
                   <Descriptions.Item label="采购数量">{detailRecord.quantity}</Descriptions.Item>
-                  <Descriptions.Item label="预估单价"><span style={{ color: '#ff4d4f', fontWeight: 600 }}>{detailRecord.price}</span></Descriptions.Item>
+                  <Descriptions.Item label="售价"><span style={{ color: '#ff4d4f', fontWeight: 600 }}>{detailRecord.price}</span></Descriptions.Item>
                 </>
               ) : (
                 <Descriptions.Item label="预估价格"><span style={{ color: '#ff4d4f', fontWeight: 600 }}>{detailRecord.price}</span></Descriptions.Item>
@@ -311,7 +311,7 @@ var Component = function MyOrdersPage() {
             </Descriptions>
 
             <div style={{ marginTop: 24 }}>
-              <Descriptions title={detailRecord.isProduct ? '商家信息' : '服务商信息'} bordered size="small" column={2}>
+              <Descriptions title={detailRecord.isProduct ? '供应商信息' : '服务商信息'} bordered size="small" column={2}>
                 <Descriptions.Item label="名称" span={2}>{detailRecord.provider}</Descriptions.Item>
                 <Descriptions.Item label="联系人">{detailRecord.contact}</Descriptions.Item>
                 <Descriptions.Item label="联系电话">{detailRecord.phone}</Descriptions.Item>
@@ -323,7 +323,7 @@ var Component = function MyOrdersPage() {
               <Descriptions title="我提交的预约信息" bordered size="small" column={2}>
                 <Descriptions.Item label="预约联系人">{detailRecord.myContact}</Descriptions.Item>
                 <Descriptions.Item label="联系电话">{detailRecord.myPhone}</Descriptions.Item>
-                <Descriptions.Item label="需求说明 / 备注" span={2}>
+                <Descriptions.Item label="需求备注" span={2}>
                   <div style={{ color: '#595959' }}>
                     {detailRecord.requirements}
                   </div>

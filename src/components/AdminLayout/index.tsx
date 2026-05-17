@@ -26,7 +26,7 @@ const MENU_ITEMS = [
   { key: 'admin-flight-plan', label: '飞行计划管理' },
   { key: 'admin-carousel', label: '轮播图管理' },
   { key: 'admin-system-user', label: '系统账号管理' },
-  { key: 'message-center', label: '消息中心' }
+  { key: 'admin-message', label: '消息公告管理' }
 ];
 
 export default function AdminLayout({ children, activeKey }: AdminLayoutProps) {
