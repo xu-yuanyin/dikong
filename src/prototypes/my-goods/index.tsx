@@ -1,15 +1,13 @@
 /**
  * @name 我的商品（商户）
  * @mode axure
- * /Users/xu/Desktop/元引信息/Axhub-Make-main/skills/axure-export-workflow/SKILL.md
- *
  */
 
 import './style.css';
 
 import React, { useState, useCallback } from 'react';
-import { Card, Table, Tag, Button, Breadcrumb, Avatar, Row, Col, Select, message, Modal, Tabs, Descriptions } from 'antd';
-import { HomeOutlined, UserOutlined, SafetyCertificateOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons';
+import { Card, Table, Tag, Button, Breadcrumb, Avatar, Row, Col, message, Modal, Tabs, Descriptions } from 'antd';
+import { HomeOutlined, UserOutlined, SafetyCertificateOutlined, PlusOutlined, ClockCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 
 var MENU_ITEMS = [
   { key: 'profile-certified', label: '我的信息', group: '账号管理' },
@@ -31,11 +29,19 @@ var GOODS_DATA = [
   { key: '1', name: 'DJI Matrice 350 RTK 工业级无人机', category: '飞行器', price: '¥68,800', stock: 15, sales: 23, status: '销售中', createDate: '2026-03-10' },
   { key: '2', name: '大疆 DJI Mavic 3 Enterprise', category: '飞行器', price: '¥23,800', stock: 28, sales: 45, status: '已下架', createDate: '2026-02-18' },
   { key: '3', name: '纵横 CW-25 垂直起降固定翼', category: '飞行器', price: '¥128,000', stock: 5, sales: 8, status: '销售中', createDate: '2026-01-20' },
-  { key: '4', name: '特价三无电池', category: '配件', price: '¥500', stock: 0, sales: 12, status: '违规下架', createDate: '2025-12-05' },
-  { key: '5', name: '道通 EVO Lite+ 航拍无人机', category: '飞行器', price: '¥7,999', stock: 20, sales: 67, status: '销售中', createDate: '2026-04-01' }
+
+  { key: '5', name: '道通 EVO Lite+ 航拍无人机', category: '飞行器', price: '¥7,999', stock: 20, sales: 67, status: '销售中', createDate: '2026-04-01' },
+  { key: '6', name: '大疆 DJI Air 3S 旗舰航拍机', category: '飞行器', price: '¥8,999', stock: 30, sales: 0, status: '待审核', createDate: '2026-05-18' },
+  { key: '7', name: '无人机专用降落伞安全系统', category: '安全设备', price: '¥3,200', stock: 50, sales: 0, status: '待审核', createDate: '2026-05-19' },
+  { key: '8', name: '低空通信模块 V2.0', category: '通信设备', price: '¥12,500', stock: 10, sales: 0, status: '已驳回', createDate: '2026-05-12', rejectReason: '商品描述中缺少必要的产品认证信息（如 3C 认证编号），且商品图片模糊不清，请补充后重新提交。' }
 ];
 
-
+var STATUS_COLOR_MAP: Record<string, string> = {
+  '销售中': 'green',
+  '已下架': 'default',
+  '待审核': 'orange',
+  '已驳回': 'red'
+};
 
 var handleNavigate = function (key: string) {
   window.location.href = '/prototypes/' + key;
@@ -52,7 +58,7 @@ var Component = function MyGoodsPage() {
     { title: '售价', dataIndex: 'price', key: 'price', render: function (p: string) { return <span style={{ color: '#ff4d4f', fontWeight: 600 }}>{p}</span>; } },
     { title: '库存数量', dataIndex: 'stock', key: 'stock', render: function (s: number) { return <span style={{ color: s === 0 ? '#ff4d4f' : s < 10 ? '#fa8c16' : '#52c41a' }}>{s}</span>; } },
     { title: '总销量', dataIndex: 'sales', key: 'sales' },
-    { title: '商品状态', dataIndex: 'status', key: 'status', render: function (s: string) { return <Tag color={s === '销售中' ? 'green' : s === '违规下架' ? 'red' : 'default'}>{s}</Tag>; } },
+    { title: '商品状态', dataIndex: 'status', key: 'status', render: function (s: string) { return <Tag color={STATUS_COLOR_MAP[s] || 'default'}>{s}</Tag>; } },
     { title: '发布日期', dataIndex: 'createDate', key: 'createDate' },
     { title: '操作', key: 'action', render: function (_: any, record: any) {
       return (
@@ -71,15 +77,28 @@ var Component = function MyGoodsPage() {
               <a style={{ color: '#ff4d4f' }} onClick={function () { message.success('已删除'); }}>删除</a>
             </>
           )}
-          {record.status === '违规下架' && (
+          {record.status === '待审核' && (
+            <span style={{ color: '#8c8c8c', fontSize: 13 }}><ClockCircleOutlined style={{ marginRight: 4 }} />等待运营审核中…</span>
+          )}
+          {record.status === '已驳回' && (
             <>
-              <a style={{ color: '#faad14' }} onClick={function () { Modal.error({ title: '违规详情', content: '您发布的商品涉嫌违规内容，已被管理员强制下架。如有异议请联系客服。' }); }}>查看原因</a>
-              <a style={{ color: '#ff4d4f' }} onClick={function () { message.success('已删除'); }}>删除</a>
+              <a style={{ color: '#faad14' }} onClick={function () { Modal.warning({ title: '驳回原因', content: record.rejectReason || '未提供驳回原因', okText: '我知道了' }); }}>查看原因</a>
+              <a style={{ color: '#1677ff' }} onClick={function () { message.info('跳转至编辑页面（模拟）'); }}>重新编辑</a>
             </>
           )}
+
         </div>
       );
     }}
+  ];
+
+  var tabItems = [
+    { key: 'all', label: '全部 (' + GOODS_DATA.length + ')' },
+    { key: '待审核', label: '待审核 (' + GOODS_DATA.filter(function (d) { return d.status === '待审核'; }).length + ')' },
+    { key: '销售中', label: '销售中 (' + GOODS_DATA.filter(function (d) { return d.status === '销售中'; }).length + ')' },
+    { key: '已下架', label: '已下架 (' + GOODS_DATA.filter(function (d) { return d.status === '已下架'; }).length + ')' },
+    { key: '已驳回', label: '已驳回 (' + GOODS_DATA.filter(function (d) { return d.status === '已驳回'; }).length + ')' },
+
   ];
 
   return (
@@ -150,9 +169,13 @@ var Component = function MyGoodsPage() {
                   <div style={{ fontSize: 20, fontWeight: 700, color: '#52c41a' }}>{GOODS_DATA.filter(function (g) { return g.status === '销售中'; }).length}</div>
                   <div style={{ fontSize: 12, color: '#8c8c8c' }}>销售中</div>
                 </div>
-                <div style={{ padding: '12px 20px', background: '#fff7e6', borderRadius: 8, textAlign: 'center' }}>
-                  <div style={{ fontSize: 20, fontWeight: 700, color: '#fa8c16' }}>{GOODS_DATA.filter(function (g) { return g.status !== '销售中'; }).length}</div>
-                  <div style={{ fontSize: 12, color: '#8c8c8c' }}>异常/下架</div>
+                <div style={{ padding: '12px 20px', background: '#fffbe6', borderRadius: 8, textAlign: 'center' }}>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: '#fa8c16' }}>{GOODS_DATA.filter(function (g) { return g.status === '待审核'; }).length}</div>
+                  <div style={{ fontSize: 12, color: '#8c8c8c' }}>待审核</div>
+                </div>
+                <div style={{ padding: '12px 20px', background: '#fff2f0', borderRadius: 8, textAlign: 'center' }}>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: '#ff4d4f' }}>{GOODS_DATA.filter(function (g) { return g.status === '已驳回'; }).length}</div>
+                  <div style={{ fontSize: 12, color: '#8c8c8c' }}>已驳回</div>
                 </div>
                 <div style={{ padding: '12px 20px', background: '#e6f4ff', borderRadius: 8, textAlign: 'center' }}>
                   <div style={{ fontSize: 20, fontWeight: 700, color: '#1677ff' }}>{GOODS_DATA.reduce(function (sum, g) { return sum + g.sales; }, 0)}</div>
@@ -160,21 +183,22 @@ var Component = function MyGoodsPage() {
                 </div>
               </div>
               
-              {GOODS_DATA.filter(function (d) { return d.status === '违规下架'; }).length > 0 && (
+
+              {GOODS_DATA.filter(function (d) { return d.status === '待审核'; }).length > 0 && (
+                <div style={{ padding: '8px 16px', background: '#fffbe6', border: '1px solid #ffe58f', borderRadius: 6, marginBottom: 16, color: '#ad6800', fontSize: 13 }}>
+                  <ClockCircleOutlined style={{ marginRight: 6 }} />您有 {GOODS_DATA.filter(function (d) { return d.status === '待审核'; }).length} 件商品正在等待平台审核，预计 1-3 个工作日内完成。
+                </div>
+              )}
+              {GOODS_DATA.filter(function (d) { return d.status === '已驳回'; }).length > 0 && (
                 <div style={{ padding: '8px 16px', background: '#fff2f0', border: '1px solid #ffccc7', borderRadius: 6, marginBottom: 16, color: '#cf1322', fontSize: 13 }}>
-                  系统提示：发现被违规下架的商品，涉嫌违反平台发布规范。如有疑问请致电客服咨询：400-123-4567。
+                  <ExclamationCircleOutlined style={{ marginRight: 6 }} />您有 {GOODS_DATA.filter(function (d) { return d.status === '已驳回'; }).length} 件商品审核未通过，请查看驳回原因并修改后重新提交。
                 </div>
               )}
               
               <Tabs
                 activeKey={activeTab}
                 onChange={setActiveTab}
-                items={[
-                  { key: 'all', label: `全部 (${GOODS_DATA.length})` },
-                  { key: '销售中', label: `销售中 (${GOODS_DATA.filter(function (d) { return d.status === '销售中'; }).length})` },
-                  { key: '已下架', label: `已下架 (${GOODS_DATA.filter(function (d) { return d.status === '已下架'; }).length})` },
-                  { key: '违规下架', label: `违规下架 (${GOODS_DATA.filter(function (d) { return d.status === '违规下架'; }).length})` }
-                ]}
+                items={tabItems}
                 style={{ marginBottom: 0 }}
               />
               <Table 
@@ -219,9 +243,16 @@ var Component = function MyGoodsPage() {
               </div>
             </Descriptions.Item>
             <Descriptions.Item label="当前状态">
-              <Tag color={detailRecord.status === '销售中' ? 'green' : detailRecord.status === '违规下架' ? 'red' : 'default'}>{detailRecord.status}</Tag>
+              <Tag color={STATUS_COLOR_MAP[detailRecord.status] || 'default'}>{detailRecord.status}</Tag>
             </Descriptions.Item>
             <Descriptions.Item label="发布日期">{detailRecord.createDate}</Descriptions.Item>
+            {detailRecord.status === '已驳回' && detailRecord.rejectReason && (
+              <Descriptions.Item label="驳回原因" span={2}>
+                <div style={{ color: '#cf1322', background: '#fff2f0', padding: '8px 12px', borderRadius: 6, border: '1px solid #ffccc7' }}>
+                  {detailRecord.rejectReason}
+                </div>
+              </Descriptions.Item>
+            )}
           </Descriptions>
         )}
       </Modal>

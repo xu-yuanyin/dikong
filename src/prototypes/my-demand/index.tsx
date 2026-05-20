@@ -1,15 +1,13 @@
 /**
  * @name 我的飞行需求
  * @mode axure
- * /Users/xu/Desktop/元引信息/Axhub-Make-main/skills/axure-export-workflow/SKILL.md
- *
  */
 
 import './style.css';
 
 import React, { useCallback } from 'react';
 import { Card, Table, Tag, Button, Breadcrumb, Avatar, Row, Col, Tabs, message, Modal, Segmented } from 'antd';
-import { HomeOutlined, UserOutlined, SafetyCertificateOutlined, PlusOutlined } from '@ant-design/icons';
+import { HomeOutlined, UserOutlined, SafetyCertificateOutlined, PlusOutlined, ClockCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 
 const MENU_ITEMS = [
   { key: 'profile', label: '我的信息', group: '' },
@@ -20,6 +18,14 @@ const MENU_ITEMS = [
   { key: 'my-goods', label: '我的商品', group: '' },
 ];
 
+var STATUS_COLOR_MAP: Record<string, string> = {
+  '征集中': 'green',
+  '待审核': 'orange',
+  '已驳回': 'red',
+  '已关闭': 'default',
+  '违规下架': 'red'
+};
+
 var MALL_COLUMNS = [
   { title: '采购标题', dataIndex: 'title', key: 'title', render: function (t: string) { return <a style={{ fontWeight: 500 }} onClick={() => handleNavigate('mall-demand-detail')}>{t}</a>; } },
   { title: '产品类型', dataIndex: 'type', key: 'type', render: function (t: string) { return <Tag color="purple">{t}</Tag>; } },
@@ -27,7 +33,7 @@ var MALL_COLUMNS = [
   { title: '需求区域', dataIndex: 'area', key: 'area' },
   { title: '截止日期', dataIndex: 'deadline', key: 'deadline' },
   { title: '状态', dataIndex: 'status', key: 'status', render: function (s: string) { 
-      return <Tag color={s === '征集中' ? 'green' : s === '违规下架' ? 'red' : 'default'}>{s}</Tag>; 
+      return <Tag color={STATUS_COLOR_MAP[s] || 'default'}>{s}</Tag>; 
   }},
   { title: '发布日期', dataIndex: 'createDate', key: 'createDate' },
   { title: '操作', key: 'action', render: function (_: any, record: any) {
@@ -40,6 +46,15 @@ var MALL_COLUMNS = [
               <a style={{ color: '#faad14' }} onClick={function () { message.success('已关闭采购需求'); }}>关闭需求</a>
             </>
           )}
+          {record.status === '待审核' && (
+            <span style={{ color: '#8c8c8c', fontSize: 13 }}><ClockCircleOutlined style={{ marginRight: 4 }} />等待运营审核中…</span>
+          )}
+          {record.status === '已驳回' && (
+            <>
+              <a style={{ color: '#faad14' }} onClick={function () { Modal.warning({ title: '驳回原因', content: record.rejectReason || '未提供驳回原因', okText: '我知道了' }); }}>查看原因</a>
+              <a style={{ color: '#1677ff' }} onClick={function () { message.info('跳转至编辑页面（模拟）'); }}>重新编辑</a>
+            </>
+          )}
           {record.status === '已关闭' && (
             <>
               <a style={{ color: '#1677ff' }}>编辑</a>
@@ -47,12 +62,7 @@ var MALL_COLUMNS = [
               <a style={{ color: '#ff4d4f' }} onClick={function () { message.success('已删除'); }}>删除</a>
             </>
           )}
-          {record.status === '违规下架' && (
-            <>
-              <a style={{ color: '#faad14' }} onClick={function () { Modal.error({ title: '违规详情', content: '您发布的采购需求涉嫌违规，已被强制下架。如有异议请联系客服。' }); }}>查看原因</a>
-              <a style={{ color: '#ff4d4f' }} onClick={function () { message.success('已删除'); }}>删除</a>
-            </>
-          )}
+
         </div>
       );
   }}
@@ -65,7 +75,7 @@ var SERVICE_COLUMNS = [
   { title: '服务区域', dataIndex: 'area', key: 'area' },
   { title: '截止日期', dataIndex: 'deadline', key: 'deadline' },
   { title: '状态', dataIndex: 'status', key: 'status', render: function (s: string) { 
-      return <Tag color={s === '征集中' ? 'green' : s === '违规下架' ? 'red' : 'default'}>{s}</Tag>; 
+      return <Tag color={STATUS_COLOR_MAP[s] || 'default'}>{s}</Tag>; 
   }},
   { title: '发布日期', dataIndex: 'createDate', key: 'createDate' },
   { title: '操作', key: 'action', render: function (_: any, record: any) {
@@ -78,6 +88,15 @@ var SERVICE_COLUMNS = [
             <a style={{ color: '#faad14' }} onClick={function () { message.success('已关闭需求'); }}>关闭需求</a>
           </>
         )}
+        {record.status === '待审核' && (
+          <span style={{ color: '#8c8c8c', fontSize: 13 }}><ClockCircleOutlined style={{ marginRight: 4 }} />等待运营审核中…</span>
+        )}
+        {record.status === '已驳回' && (
+          <>
+            <a style={{ color: '#faad14' }} onClick={function () { Modal.warning({ title: '驳回原因', content: record.rejectReason || '未提供驳回原因', okText: '我知道了' }); }}>查看原因</a>
+            <a style={{ color: '#1677ff' }} onClick={function () { message.info('跳转至编辑页面（模拟）'); }}>重新编辑</a>
+          </>
+        )}
         {record.status === '已关闭' && (
           <>
             <a style={{ color: '#1677ff' }}>编辑</a>
@@ -85,12 +104,7 @@ var SERVICE_COLUMNS = [
             <a style={{ color: '#ff4d4f' }} onClick={function () { message.success('已删除'); }}>删除</a>
           </>
         )}
-        {record.status === '违规下架' && (
-          <>
-            <a style={{ color: '#faad14' }} onClick={function () { Modal.error({ title: '违规详情', content: '您发布的需求涉嫌违规内容，已被管理员强制下架。如有异议请联系客服。' }); }}>查看原因</a>
-            <a style={{ color: '#ff4d4f' }} onClick={function () { message.success('已删除'); }}>删除</a>
-          </>
-        )}
+
       </div>
     );
   }}
@@ -99,16 +113,20 @@ var SERVICE_COLUMNS = [
 var MALL_DATA = [
   { key: '1', title: '求购 10 台工业级测绘无人机', type: '飞行器', budget: '¥50-80万', area: '全市', status: '征集中', createDate: '2026-04-20', deadline: '2026-05-31' },
   { key: '2', title: '采购 5 套低空通信基站设备', type: '通信设备', budget: '¥20-30万', area: '主城区', status: '已关闭', createDate: '2026-04-18', deadline: '2026-06-15' },
-  { key: '3', title: '特种设备采购需求测试', type: '安全设备', budget: '电议', area: '郊区', status: '违规下架', createDate: '2026-04-10', deadline: '2026-05-20' },
-  { key: '4', title: '采购 eVTOL 载人飞行器 2 架', type: '飞行器', budget: '¥500万以上', area: '全省', status: '征集中', createDate: '2026-04-05', deadline: '2026-08-01' }
+
+  { key: '4', title: '采购 eVTOL 载人飞行器 2 架', type: '飞行器', budget: '¥500万以上', area: '全省', status: '征集中', createDate: '2026-04-05', deadline: '2026-08-01' },
+  { key: '5', title: '批量采购植保无人机电池组', type: '配件', budget: '¥5-8万', area: '全市', status: '待审核', createDate: '2026-05-18', deadline: '2026-06-30' },
+  { key: '6', title: '采购无人机防撞雷达模块', type: '安全设备', budget: '¥10-15万', area: '主城区', status: '已驳回', createDate: '2026-05-12', deadline: '2026-07-01', rejectReason: '需求描述过于简略，请补充具体的技术参数要求、数量及交付标准后重新提交。' }
 ];
 
 var SERVICE_DATA = [
   { key: '1', title: '需要测绘无人机培训服务', type: '飞行培训', budget: '¥3,000-5,000', area: '主城区', status: '征集中', createDate: '2026-04-20', deadline: '2026-05-15', desc: '需要提供5个工作日的封闭式培训' },
   { key: '2', title: '航拍服务需求（房地产项目）', type: '低空旅游', budget: '¥5,000-8,000', area: '全市', status: '已关闭', createDate: '2026-04-10', deadline: '2026-04-30', desc: '楼盘宣传片航拍素材收集' },
-  { key: '3', title: '测试需求发包', type: '飞行器服务', budget: '电议', area: '郊区', status: '违规下架', createDate: '2026-04-18', deadline: '2026-05-20', desc: '测试使用，无需响应' },
+
   { key: '4', title: '电力巡检服务外包', type: '飞行器服务', budget: '¥10,000-15,000', area: '全市', status: '已关闭', createDate: '2026-03-15', deadline: '2026-04-15', desc: '高压线网日常巡检' },
-  { key: '5', title: '大型活动航拍直播服务', type: '低空旅游', budget: '¥8,000-12,000', area: '主城区', status: '征集中', createDate: '2026-04-25', deadline: '2026-05-30', desc: '马拉松赛事全程跟拍直播' }
+  { key: '5', title: '大型活动航拍直播服务', type: '低空旅游', budget: '¥8,000-12,000', area: '主城区', status: '征集中', createDate: '2026-04-25', deadline: '2026-05-30', desc: '马拉松赛事全程跟拍直播' },
+  { key: '6', title: '农田精准喷洒飞防服务', type: '飞行器服务', budget: '¥2,000-4,000', area: '郊区', status: '待审核', createDate: '2026-05-19', deadline: '2026-06-15', desc: '500亩水稻田喷洒农药' },
+  { key: '7', title: '景区低空观光路线规划', type: '低空旅游', budget: '¥15,000-25,000', area: '全市', status: '已驳回', createDate: '2026-05-10', deadline: '2026-07-01', desc: '景区空中游览路线设计', rejectReason: '该需求涉及景区空域申请相关审批，请先提供景区管委会出具的空域使用意向书后再次提交。' }
 ];
 
 var handleNavigate = function (key: string) {
@@ -119,6 +137,16 @@ const Component = function MyDemandPage() {
   const [activeTab, setActiveTab] = React.useState('all');
   const [activeType, setActiveType] = React.useState('service');
 
+  var currentData = activeType === 'service' ? SERVICE_DATA : MALL_DATA;
+
+  var tabItems = [
+    { key: 'all', label: '全部 (' + currentData.length + ')' },
+    { key: '待审核', label: '待审核 (' + currentData.filter(function (d) { return d.status === '待审核'; }).length + ')' },
+    { key: '征集中', label: '征集中 (' + currentData.filter(function (d) { return d.status === '征集中'; }).length + ')' },
+    { key: '已关闭', label: '已关闭 (' + currentData.filter(function (d) { return d.status === '已关闭'; }).length + ')' },
+    { key: '已驳回', label: '已驳回 (' + currentData.filter(function (d) { return d.status === '已驳回'; }).length + ')' },
+
+  ];
 
   return (
     <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
@@ -199,25 +227,26 @@ const Component = function MyDemandPage() {
               extra={<Button type="primary" icon={<PlusOutlined />} style={{ background: '#722ed1', borderColor: '#722ed1' }} onClick={function () { handleNavigate(activeType === 'service' ? 'demand-publish' : 'mall-demand-publish'); }}>发布需求</Button>}
               style={{ borderRadius: 12 }}
             >
-              {(activeType === 'service' ? SERVICE_DATA : MALL_DATA).filter(function (d) { return d.status === '违规下架'; }).length > 0 && (
+
+              {currentData.filter(function (d) { return d.status === '待审核'; }).length > 0 && (
+                <div style={{ padding: '8px 16px', background: '#fffbe6', border: '1px solid #ffe58f', borderRadius: 6, marginBottom: 16, color: '#ad6800', fontSize: 13 }}>
+                  <ClockCircleOutlined style={{ marginRight: 6 }} />您有 {currentData.filter(function (d) { return d.status === '待审核'; }).length} 项需求正在等待平台审核，预计 1-3 个工作日内完成。
+                </div>
+              )}
+              {currentData.filter(function (d) { return d.status === '已驳回'; }).length > 0 && (
                 <div style={{ padding: '8px 16px', background: '#fff2f0', border: '1px solid #ffccc7', borderRadius: 6, marginBottom: 16, color: '#cf1322', fontSize: 13 }}>
-                  系统提示：发现被违规下架的需求，涉嫌违反平台发布规范。如有疑问请致电客服咨询：400-123-4567。
+                  <ExclamationCircleOutlined style={{ marginRight: 6 }} />您有 {currentData.filter(function (d) { return d.status === '已驳回'; }).length} 项需求审核未通过，请查看驳回原因并修改后重新提交。
                 </div>
               )}
               <Tabs
                 activeKey={activeTab}
                 onChange={setActiveTab}
-                items={[
-                  { key: 'all', label: `全部 (${(activeType === 'service' ? SERVICE_DATA : MALL_DATA).length})` },
-                  { key: '征集中', label: `征集中 (${(activeType === 'service' ? SERVICE_DATA : MALL_DATA).filter(function (d) { return d.status === '征集中'; }).length})` },
-                  { key: '已关闭', label: `已关闭 (${(activeType === 'service' ? SERVICE_DATA : MALL_DATA).filter(function (d) { return d.status === '已关闭'; }).length})` },
-                  { key: '违规下架', label: `违规下架 (${(activeType === 'service' ? SERVICE_DATA : MALL_DATA).filter(function (d) { return d.status === '违规下架'; }).length})` }
-                ]}
+                items={tabItems}
                 style={{ marginBottom: 0 }}
               />
               <Table 
                 columns={activeType === 'service' ? SERVICE_COLUMNS : MALL_COLUMNS} 
-                dataSource={activeTab === 'all' ? (activeType === 'service' ? SERVICE_DATA : MALL_DATA) : (activeType === 'service' ? SERVICE_DATA : MALL_DATA).filter(function(d) { return d.status === activeTab; })} 
+                dataSource={activeTab === 'all' ? currentData : currentData.filter(function(d) { return d.status === activeTab; })} 
                 pagination={{ pageSize: 5 }} 
               />
             </Card>

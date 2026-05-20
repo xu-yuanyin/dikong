@@ -141,7 +141,7 @@ var Component = function MallPublishPage() {
               <div style={{ display: 'flex', gap: 12 }}>
                 <Button size="large" onClick={function () { handleNavigate('mall-list'); }}>关闭</Button>
                 <Button type="primary" size="large" style={{ flex: 1, background: '#722ed1', borderColor: '#722ed1' }} onClick={function () {
-                  form.validateFields().then(function () { message.success('商品发布成功！'); }).catch(function () {});
+                  form.validateFields().then(function () { message.success('商品上架申请已提交，等待运营人员审核！'); setTimeout(function () { handleNavigate('my-goods'); }, 1500); }).catch(function () {});
                 }}>提交发布</Button>
               </div>
             </Form.Item>

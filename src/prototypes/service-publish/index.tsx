@@ -181,8 +181,8 @@ var Component = function ServicePublishPage() {
                 <Button size="large" onClick={function () { handleNavigate('service-list'); }}>关闭</Button>
                 <Button type="primary" size="large" style={{ flex: 1 }} onClick={function () {
                   form.validateFields().then(function () { 
-                    message.success('服务发布成功，已上架展示！');
-                    setTimeout(() => handleNavigate('my-service'), 1000);
+                    message.success('服务发布申请已提交，等待后台运营人员审核！');
+                    setTimeout(() => handleNavigate('my-service'), 1500);
                   }).catch(function () {});
                 }}>提交发布</Button>
               </div>

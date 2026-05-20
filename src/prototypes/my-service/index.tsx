@@ -6,8 +6,8 @@
 import './style.css';
 
 import React, { useState, useCallback } from 'react';
-import { Card, Table, Tag, Button, Breadcrumb, Tabs, Avatar, Row, Col, message, Dropdown, Menu, Modal, Descriptions } from 'antd';
-import { HomeOutlined, UserOutlined, SafetyCertificateOutlined, PlusOutlined, MoreOutlined, EditOutlined, DeleteOutlined, StopOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import { Card, Table, Tag, Button, Breadcrumb, Tabs, Avatar, Row, Col, message, Modal, Descriptions } from 'antd';
+import { HomeOutlined, UserOutlined, SafetyCertificateOutlined, PlusOutlined, ClockCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 
 var MENU_ITEMS = [
   { key: 'profile-certified', label: '我的信息', group: '账号管理' },
@@ -29,7 +29,10 @@ var PUBLISHED_DATA = [
   { key: '1', name: '电力通信精细化巡检服务', category: '行业应用', price: '￥3,000/天', status: '已发布', views: 342, orders: 12, createDate: '2026-03-10' },
   { key: '2', name: '大疆 M300 飞行器年检保养', category: '飞行器服务', price: '￥500/次', status: '已发布', views: 890, orders: 45, createDate: '2026-03-15' },
   { key: '3', name: '房地产/楼盘全景航拍', category: '航拍影像', price: '￥1,500/组', status: '已暂停', views: 120, orders: 3, createDate: '2026-04-01' },
-  { key: '4', name: '多旋翼无人机考证冲刺班', category: '飞行培训', price: '￥6,800/人', status: '违规下架', views: 0, orders: 0, createDate: '2026-04-20' }
+
+  { key: '5', name: '城市空中观光体验飞行', category: '低空旅游', price: '￥299/人', status: '待审核', views: 0, orders: 0, createDate: '2026-05-18' },
+  { key: '6', name: '无人机物流配送试点服务', category: '行业应用', price: '￥50/单', status: '待审核', views: 0, orders: 0, createDate: '2026-05-19' },
+  { key: '7', name: '高空清洗无人机服务', category: '行业应用', price: '￥800/次', status: '已驳回', views: 0, orders: 0, createDate: '2026-05-10', rejectReason: '服务资质文件不清晰，请重新上传高清版营业执照与相关资质证明后再次提交。' }
 ];
 
 var handleNavigate = function (key: string) {
@@ -41,6 +44,13 @@ var Component = function MyServicePage() {
   var [detailRecord, setDetailRecord] = useState<any>(null);
   var [previewOpen, setPreviewOpen] = useState(false);
 
+  var STATUS_COLOR_MAP: Record<string, string> = {
+    '已发布': 'green',
+    '已暂停': 'default',
+    '待审核': 'orange',
+    '已驳回': 'red'
+  };
+
   var COLUMNS = [
     { title: '服务名称', dataIndex: 'name', key: 'name', render: function (t: string) { return <a style={{ fontWeight: 500 }}>{t}</a>; } },
     { title: '分类', dataIndex: 'category', key: 'category', render: function (t: string) { return <Tag color="blue">{t}</Tag>; } },
@@ -48,7 +58,7 @@ var Component = function MyServicePage() {
     { title: '浏览量', dataIndex: 'views', key: 'views' },
     { title: '成单量', dataIndex: 'orders', key: 'orders' },
     { title: '状态', dataIndex: 'status', key: 'status', render: function (s: string) { 
-        return <Tag color={s === '已发布' ? 'green' : s === '已暂停' ? 'default' : 'red'}>{s}</Tag>; 
+        return <Tag color={STATUS_COLOR_MAP[s] || 'default'}>{s}</Tag>; 
     }},
     { title: '发布时间', dataIndex: 'createDate', key: 'createDate' },
     { title: '操作', key: 'action', render: function (_: any, record: any) {
@@ -65,12 +75,28 @@ var Component = function MyServicePage() {
               <a style={{ color: '#ff4d4f' }} onClick={() => message.success('已删除')}>删除</a>
             </>
           )}
-          {record.status === '违规下架' && (
-            <a style={{ color: '#ff4d4f' }} onClick={() => message.success('已删除')}>删除</a>
+          {record.status === '待审核' && (
+            <span style={{ color: '#8c8c8c', fontSize: 13 }}><ClockCircleOutlined style={{ marginRight: 4 }} />等待运营审核中…</span>
           )}
+          {record.status === '已驳回' && (
+            <>
+              <a style={{ color: '#faad14' }} onClick={function () { Modal.warning({ title: '驳回原因', content: record.rejectReason || '未提供驳回原因', okText: '我知道了' }); }}>查看原因</a>
+              <a style={{ color: '#1677ff' }} onClick={function () { message.info('跳转至编辑页面（模拟）'); }}>重新编辑</a>
+            </>
+          )}
+
         </div>
       );
     }}
+  ];
+
+  var tabItems = [
+    { key: 'all', label: '全部 (' + PUBLISHED_DATA.length + ')' },
+    { key: '待审核', label: '待审核 (' + PUBLISHED_DATA.filter(function (d) { return d.status === '待审核'; }).length + ')' },
+    { key: '已发布', label: '已发布 (' + PUBLISHED_DATA.filter(function (d) { return d.status === '已发布'; }).length + ')' },
+    { key: '已暂停', label: '已暂停 (' + PUBLISHED_DATA.filter(function (d) { return d.status === '已暂停'; }).length + ')' },
+    { key: '已驳回', label: '已驳回 (' + PUBLISHED_DATA.filter(function (d) { return d.status === '已驳回'; }).length + ')' },
+
   ];
 
   return (
@@ -140,15 +166,20 @@ var Component = function MyServicePage() {
                   系统提示：发现被违规下架的服务，涉嫌违反平台发布规范。如有疑问请致电客服咨询：400-123-4567。
                 </div>
               )}
+              {PUBLISHED_DATA.filter(d => d.status === '待审核').length > 0 && (
+                <div style={{ padding: '8px 16px', background: '#fffbe6', border: '1px solid #ffe58f', borderRadius: 6, marginBottom: 16, color: '#ad6800', fontSize: 13 }}>
+                  <ClockCircleOutlined style={{ marginRight: 6 }} />您有 {PUBLISHED_DATA.filter(d => d.status === '待审核').length} 项服务正在等待平台审核，预计 1-3 个工作日内完成。
+                </div>
+              )}
+              {PUBLISHED_DATA.filter(d => d.status === '已驳回').length > 0 && (
+                <div style={{ padding: '8px 16px', background: '#fff2f0', border: '1px solid #ffccc7', borderRadius: 6, marginBottom: 16, color: '#cf1322', fontSize: 13 }}>
+                  <ExclamationCircleOutlined style={{ marginRight: 6 }} />您有 {PUBLISHED_DATA.filter(d => d.status === '已驳回').length} 项服务审核未通过，请查看驳回原因并修改后重新提交。
+                </div>
+              )}
               <Tabs
                 activeKey={activeTab}
                 onChange={setActiveTab}
-                items={[
-                  { key: 'all', label: `全部 (${PUBLISHED_DATA.length})` },
-                  { key: '已发布', label: `已发布 (${PUBLISHED_DATA.filter(d => d.status === '已发布').length})` },
-                  { key: '已暂停', label: `已暂停 (${PUBLISHED_DATA.filter(d => d.status === '已暂停').length})` },
-                  { key: '违规下架', label: `违规下架 (${PUBLISHED_DATA.filter(d => d.status === '违规下架').length})` }
-                ]}
+                items={tabItems}
                 style={{ marginBottom: 0 }}
               />
               <Table columns={COLUMNS} dataSource={activeTab === 'all' ? PUBLISHED_DATA : PUBLISHED_DATA.filter(d => d.status === activeTab)} pagination={{ pageSize: 10 }} />
@@ -183,11 +214,18 @@ var Component = function MyServicePage() {
             <Descriptions.Item label="联系人">王工</Descriptions.Item>
             <Descriptions.Item label="联系电话"><span style={{ color: '#1677ff' }}>138-0000-8888</span></Descriptions.Item>
             <Descriptions.Item label="当前状态">
-              <Tag color={detailRecord.status === '已发布' ? 'green' : detailRecord.status === '已暂停' ? 'default' : 'red'}>{detailRecord.status}</Tag>
+              <Tag color={STATUS_COLOR_MAP[detailRecord.status] || 'default'}>{detailRecord.status}</Tag>
             </Descriptions.Item>
             <Descriptions.Item label="发布时间">{detailRecord.createDate}</Descriptions.Item>
             <Descriptions.Item label="浏览量">{detailRecord.views}</Descriptions.Item>
             <Descriptions.Item label="成单量">{detailRecord.orders}</Descriptions.Item>
+            {detailRecord.status === '已驳回' && detailRecord.rejectReason && (
+              <Descriptions.Item label="驳回原因" span={2}>
+                <div style={{ color: '#cf1322', background: '#fff2f0', padding: '8px 12px', borderRadius: 6, border: '1px solid #ffccc7' }}>
+                  {detailRecord.rejectReason}
+                </div>
+              </Descriptions.Item>
+            )}
           </Descriptions>
         )}
       </Modal>

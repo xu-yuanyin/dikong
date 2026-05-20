@@ -8,8 +8,8 @@
 import './style.css';
 
 import React, { useState, useCallback } from 'react';
-import { Card, Form, Input, Select, Button, Breadcrumb, Avatar, Descriptions, Tag, message, Row, Col, Modal, Alert, Steps, Result } from 'antd';
-import { HomeOutlined, UserOutlined, SafetyCertificateOutlined, CheckCircleOutlined, ExclamationCircleOutlined, IdcardOutlined, PhoneOutlined, EnvironmentOutlined, RocketOutlined, TeamOutlined, ShopOutlined, CustomerServiceOutlined, BankOutlined } from '@ant-design/icons';
+import { Card, Form, Input, Select, Button, Breadcrumb, Avatar, Descriptions, Tag, message, Row, Col, Modal, Alert, Steps, Result, Progress, Divider } from 'antd';
+import { HomeOutlined, UserOutlined, SafetyCertificateOutlined, CheckCircleOutlined, ExclamationCircleOutlined, IdcardOutlined, PhoneOutlined, EnvironmentOutlined, RocketOutlined, TeamOutlined, ShopOutlined, CustomerServiceOutlined, BankOutlined, LockOutlined, MailOutlined, MobileOutlined, EditOutlined, KeyOutlined } from '@ant-design/icons';
 
 var ROLES = [
   { value: 'personal', label: '个人用户', color: '#1677ff', icon: <UserOutlined /> },
@@ -53,16 +53,79 @@ var PRODUCT_CATEGORIES = [
   { value: 'other', label: '其他' }
 ];
 
+var getPasswordStrength = function (pwd: string) {
+  if (!pwd) return { level: 0, text: '', color: '#d9d9d9' };
+  var score = 0;
+  if (pwd.length >= 8) score++;
+  if (/[A-Z]/.test(pwd)) score++;
+  if (/[0-9]/.test(pwd)) score++;
+  if (/[^A-Za-z0-9]/.test(pwd)) score++;
+  if (score <= 1) return { level: 33, text: '弱', color: '#ff4d4f' };
+  if (score <= 2) return { level: 66, text: '中', color: '#faad14' };
+  return { level: 100, text: '强', color: '#52c41a' };
+};
+
 var Component = function ProfilePage() {
   var [editMode, setEditMode] = useState(false);
   var [certOpen, setCertOpen] = useState(false);
   var [certStep, setCertStep] = useState(0);
+  var [passwordOpen, setPasswordOpen] = useState(false);
+  var [passwordLoading, setPasswordLoading] = useState(false);
+  var [newPassword, setNewPassword] = useState('');
+  var [phoneOpen, setPhoneOpen] = useState(false);
+  var [phoneCooldown, setPhoneCooldown] = useState(0);
+  var [emailOpen, setEmailOpen] = useState(false);
+  var [emailCooldown, setEmailCooldown] = useState(0);
   var [form] = Form.useForm();
   var [certForm] = Form.useForm();
+  var [pwdForm] = Form.useForm();
+  var [phoneForm] = Form.useForm();
+  var [emailForm] = Form.useForm();
 
   var handleNavigate = useCallback(function (key: string) {
     window.location.href = '/prototypes/' + key;
   }, []);
+
+  var passwordStrength = getPasswordStrength(newPassword);
+
+  var handlePasswordSubmit = function () {
+    pwdForm.validateFields().then(function (values: any) {
+      if (values.newPassword !== values.confirmPassword) {
+        message.error('两次输入的新密码不一致！');
+        return;
+      }
+      setPasswordLoading(true);
+      setTimeout(function () {
+        setPasswordLoading(false);
+        setPasswordOpen(false);
+        setNewPassword('');
+        pwdForm.resetFields();
+        message.success('密码修改成功！请使用新密码重新登录。');
+      }, 1500);
+    }).catch(function () {});
+  };
+
+  var startPhoneCooldown = function () {
+    setPhoneCooldown(60);
+    var timer = setInterval(function () {
+      setPhoneCooldown(function (prev: number) {
+        if (prev <= 1) { clearInterval(timer); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+    message.success('验证码已发送至您的手机');
+  };
+
+  var startEmailCooldown = function () {
+    setEmailCooldown(60);
+    var timer = setInterval(function () {
+      setEmailCooldown(function (prev: number) {
+        if (prev <= 1) { clearInterval(timer); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+    message.success('验证码已发送至您的邮箱');
+  };
 
   var currentRole = ROLES[1];
   var certStatus = 'uncertified';
@@ -219,6 +282,10 @@ var Component = function ProfilePage() {
                 <Avatar size={80} icon={<UserOutlined />} style={{ backgroundColor: currentRole.color, marginBottom: 12 }} />
                 <div style={{ fontSize: 18, fontWeight: 600, color: '#1f1f1f' }}>张明</div>
                 <Tag color={currentRole.color} style={{ marginTop: 8 }}>{currentRole.label}</Tag>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 12 }}>
+                  <Button size="small" type="link" icon={<EditOutlined />} onClick={function () { setEditMode(true); }}>修改资料</Button>
+                  <Button size="small" type="link" icon={<KeyOutlined />} onClick={function () { pwdForm.resetFields(); setNewPassword(''); setPasswordOpen(true); }}>修改密码</Button>
+                </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {MENU_ITEMS.map(function (item) {
@@ -281,6 +348,45 @@ var Component = function ProfilePage() {
                   <Descriptions.Item label="账户状态"><Tag color="green">正常</Tag></Descriptions.Item>
                 </Descriptions>
               )}
+            </Card>
+
+            {/* 账号安全设置 */}
+            <Card title="账号安全设置" style={{ borderRadius: 12, marginBottom: 24 }} extra={<Tag color="green"><LockOutlined /> 安全等级：高</Tag>}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                {/* 登录密码 */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 0', borderBottom: '1px solid #f0f0f0' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 8, background: '#e6f4ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LockOutlined style={{ fontSize: 18, color: '#1677ff' }} /></div>
+                    <div>
+                      <div style={{ fontWeight: 500, fontSize: 14 }}>登录密码</div>
+                      <div style={{ fontSize: 12, color: '#8c8c8c' }}>已设置。建议定期更换密码以保障账户安全。</div>
+                    </div>
+                  </div>
+                  <Button type="link" onClick={function () { pwdForm.resetFields(); setNewPassword(''); setPasswordOpen(true); }}>修改密码</Button>
+                </div>
+                {/* 安全手机 */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 0', borderBottom: '1px solid #f0f0f0' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 8, background: '#f6ffed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><MobileOutlined style={{ fontSize: 18, color: '#52c41a' }} /></div>
+                    <div>
+                      <div style={{ fontWeight: 500, fontSize: 14 }}>绑定手机</div>
+                      <div style={{ fontSize: 12, color: '#8c8c8c' }}>已绑定。当前绑定手机：138****8888</div>
+                    </div>
+                  </div>
+                  <Button type="link" onClick={function () { phoneForm.resetFields(); setPhoneCooldown(0); setPhoneOpen(true); }}>更换手机</Button>
+                </div>
+                {/* 安全邮箱 */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 0' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 8, background: '#fff7e6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><MailOutlined style={{ fontSize: 18, color: '#fa8c16' }} /></div>
+                    <div>
+                      <div style={{ fontWeight: 500, fontSize: 14 }}>安全邮箱</div>
+                      <div style={{ fontSize: 12, color: '#8c8c8c' }}>已绑定。当前绑定邮箱：zhangming@example.com</div>
+                    </div>
+                  </div>
+                  <Button type="link" onClick={function () { emailForm.resetFields(); setEmailCooldown(0); setEmailOpen(true); }}>更换邮箱</Button>
+                </div>
+              </div>
             </Card>
 
             <Card
@@ -367,6 +473,89 @@ var Component = function ProfilePage() {
             subTitle="管理员将在 1-3 个工作日内完成审核，审核通过后您可使用平台全部功能。"
           />
         )}
+      </Modal>
+
+      {/* 修改密码 Modal */}
+      <Modal
+        title={<span><LockOutlined style={{ marginRight: 8 }} />修改登录密码</span>}
+        open={passwordOpen}
+        onCancel={function () { setPasswordOpen(false); setNewPassword(''); pwdForm.resetFields(); }}
+        onOk={handlePasswordSubmit}
+        confirmLoading={passwordLoading}
+        okText="确认修改"
+        width={480}
+      >
+        <Form form={pwdForm} layout="vertical" style={{ marginTop: 16 }}>
+          <Form.Item name="oldPassword" label="当前密码" rules={[{ required: true, message: '请输入当前密码' }]}>
+            <Input.Password size="large" placeholder="请输入当前密码" />
+          </Form.Item>
+          <Form.Item name="newPassword" label="新密码" rules={[{ required: true, message: '请输入新密码' }, { min: 8, message: '密码长度不少于8位' }]}>
+            <Input.Password size="large" placeholder="请输入新密码（至少8位）" onChange={function (e) { setNewPassword(e.target.value); }} />
+          </Form.Item>
+          {newPassword && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <span style={{ fontSize: 12, color: '#8c8c8c' }}>密码强度：</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: passwordStrength.color }}>{passwordStrength.text}</span>
+              </div>
+              <Progress percent={passwordStrength.level} showInfo={false} strokeColor={passwordStrength.color} size="small" />
+              <div style={{ fontSize: 11, color: '#bfbfbf', marginTop: 4 }}>建议包含大写字母、数字和特殊字符</div>
+            </div>
+          )}
+          <Form.Item name="confirmPassword" label="确认新密码" rules={[{ required: true, message: '请再次输入新密码' }]}>
+            <Input.Password size="large" placeholder="请再次输入新密码" />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* 更换手机 Modal */}
+      <Modal
+        title={<span><MobileOutlined style={{ marginRight: 8 }} />更换绑定手机</span>}
+        open={phoneOpen}
+        onCancel={function () { setPhoneOpen(false); }}
+        onOk={function () { phoneForm.validateFields().then(function () { message.success('手机号更换成功！'); setPhoneOpen(false); }).catch(function () {}); }}
+        okText="确认更换"
+        width={480}
+      >
+        <Form form={phoneForm} layout="vertical" style={{ marginTop: 16 }}>
+          <Form.Item label="当前手机号">
+            <Input size="large" value="138****8888" disabled />
+          </Form.Item>
+          <Form.Item name="newPhone" label="新手机号" rules={[{ required: true, message: '请输入新手机号' }]}>
+            <Input size="large" placeholder="请输入新手机号" />
+          </Form.Item>
+          <Form.Item name="verifyCode" label="验证码" rules={[{ required: true, message: '请输入验证码' }]}>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Input size="large" placeholder="请输入短信验证码" style={{ flex: 1 }} />
+              <Button size="large" disabled={phoneCooldown > 0} onClick={startPhoneCooldown}>{phoneCooldown > 0 ? phoneCooldown + 's 后重试' : '获取验证码'}</Button>
+            </div>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* 更换邮箱 Modal */}
+      <Modal
+        title={<span><MailOutlined style={{ marginRight: 8 }} />更换安全邮箱</span>}
+        open={emailOpen}
+        onCancel={function () { setEmailOpen(false); }}
+        onOk={function () { emailForm.validateFields().then(function () { message.success('邮箱更换成功！'); setEmailOpen(false); }).catch(function () {}); }}
+        okText="确认更换"
+        width={480}
+      >
+        <Form form={emailForm} layout="vertical" style={{ marginTop: 16 }}>
+          <Form.Item label="当前邮箱">
+            <Input size="large" value="zhangming@example.com" disabled />
+          </Form.Item>
+          <Form.Item name="newEmail" label="新邮箱地址" rules={[{ required: true, message: '请输入新邮箱' }, { type: 'email', message: '请输入有效的邮箱地址' }]}>
+            <Input size="large" placeholder="请输入新邮箱地址" />
+          </Form.Item>
+          <Form.Item name="emailCode" label="验证码" rules={[{ required: true, message: '请输入验证码' }]}>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Input size="large" placeholder="请输入邮箱验证码" style={{ flex: 1 }} />
+              <Button size="large" disabled={emailCooldown > 0} onClick={startEmailCooldown}>{emailCooldown > 0 ? emailCooldown + 's 后重试' : '获取验证码'}</Button>
+            </div>
+          </Form.Item>
+        </Form>
       </Modal>
     </div>
   );

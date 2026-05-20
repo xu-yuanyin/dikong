@@ -133,7 +133,7 @@ var Component = function MallDemandPublishPage() {
               <div style={{ display: 'flex', gap: 12 }}>
                 <Button size="large" onClick={function () { handleNavigate('mall-demand'); }}>关闭</Button>
                 <Button type="primary" size="large" style={{ flex: 1, background: '#722ed1', borderColor: '#722ed1' }} onClick={function () {
-                  form.validateFields().then(function () { message.success('采购需求发布成功，等待供应商响应！'); }).catch(function () {});
+                  form.validateFields().then(function () { message.success('采购需求提交成功，正在等待平台审核！'); setTimeout(function () { handleNavigate('my-demand'); }, 1500); }).catch(function () {});
                 }}>发布采购需求</Button>
               </div>
             </Form.Item>
