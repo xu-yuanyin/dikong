@@ -6,7 +6,7 @@
 import './style.css';
 
 import React, { useState, useCallback } from 'react';
-import { Card, Tag, Button, Modal, Form, Input, Select, Avatar, message, Empty, Breadcrumb, Row, Col } from 'antd';
+import { Card, Tag, Button, Modal, Form, Input, Select, Avatar, message, Empty, Breadcrumb, Row, Col, Descriptions } from 'antd';
 import { UserOutlined, RocketOutlined, TeamOutlined, CustomerServiceOutlined, ShopOutlined, BankOutlined, PlusOutlined, SwapOutlined, CheckCircleOutlined, ClockCircleOutlined, ExclamationCircleOutlined, SafetyCertificateOutlined, HomeOutlined, IdcardOutlined, PhoneOutlined, EnvironmentOutlined, EyeOutlined } from '@ant-design/icons';
 
 var MENU_ITEMS = [
@@ -223,6 +223,16 @@ var Component = function RoleManagementPage() {
             </Card>
           </Col>
           <Col xs={24} md={18}>
+            {/* 认证信息 */}
+            <Card title="认证信息" style={{ borderRadius: 12, marginBottom: 24 }}>
+              <Descriptions column={2} bordered>
+                <Descriptions.Item label="认证状态"><Tag color="green">已认证</Tag></Descriptions.Item>
+                <Descriptions.Item label="当前激活角色"><Tag color="#52c41a">飞手</Tag></Descriptions.Item>
+                <Descriptions.Item label="首次认证时间">2026-03-15</Descriptions.Item>
+                <Descriptions.Item label="主认证编号">CERT-2026-0315-001</Descriptions.Item>
+              </Descriptions>
+            </Card>
+
             <Card style={{ borderRadius: 12, marginBottom: 24 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div>
@@ -322,6 +332,29 @@ var Component = function RoleManagementPage() {
                 </div>
               </Card>
             )}
+
+            {/* 角色说明 */}
+            <Card title="角色说明" style={{ borderRadius: 12, marginTop: 24 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {ROLES.map(function (role) {
+                  var isCertified = myRoles.some(function (mr) { return mr.value === role.value && mr.status === 'certified'; });
+                  var isPending = myRoles.some(function (mr) { return mr.value === role.value && mr.status === 'pending'; });
+                  return (
+                    <div key={role.label} style={{ padding: '14px 16px', background: '#fafafa', borderRadius: 8, display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                      <div style={{ color: role.color, fontSize: 22, marginTop: 2, flexShrink: 0 }}>{role.icon}</div>
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                          <span style={{ fontSize: 14, fontWeight: 600, color: '#1f1f1f' }}>{role.label}</span>
+                          {isCertified && <Tag color="green">已认证</Tag>}
+                          {isPending && <Tag color="orange">审核中</Tag>}
+                        </div>
+                        <div style={{ fontSize: 13, color: '#8c8c8c', lineHeight: 1.6 }}>{role.desc}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
           </Col>
         </Row>
       </div>

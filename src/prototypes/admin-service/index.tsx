@@ -5,29 +5,86 @@
 import './style.css';
 import React, { useState } from 'react';
 import AdminLayout from '../../components/AdminLayout';
-import { Card, Table, Tag, Button, Breadcrumb, Space, Modal, Input, Select, message, Tooltip, Descriptions, Tabs, Popconfirm, Divider } from 'antd';
-import { EyeOutlined, SearchOutlined, CheckCircleOutlined, RocketOutlined, AuditOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { Card, Table, Tag, Button, Breadcrumb, Space, Modal, Input, Select, message, Tooltip, Descriptions, Tabs, Popconfirm, Divider, Timeline } from 'antd';
+import { EyeOutlined, SearchOutlined, CheckCircleOutlined, RocketOutlined, AuditOutlined, CloseCircleOutlined, HistoryOutlined } from '@ant-design/icons';
 
 var SERVICE_DATA = [
-  { key: '1', id: 'SRV-2026-001', title: '高精度无人机倾斜摄影与航拍测绘', category: '航拍测绘', provider: 'XX测绘科技有限公司', contact: '王经理', phone: '13811112222', time: '2026-04-20 14:00:00', status: 'normal', billing: '按面积', price: '¥800/平方公里', area: '浙江省全省', qualifications: ['测绘航空摄影乙级资质', '民用无人驾驶航空器运营合格证'], desc: '提供高精度正射影像及三维倾斜摄影模型构建服务。' },
-  { key: '2', id: 'SRV-2026-002', title: '大面积农林植保喷洒作业', category: '农林植保', provider: '蓝天农业服务部', contact: '张总', phone: '13911113333', time: '2026-04-21 09:30:15', status: 'normal', billing: '按面积', price: '¥10/亩', area: '杭州市及周边', qualifications: ['民用无人驾驶航空器运营合格证'], desc: '采用大疆T40农业无人机，支持大面积喷洒作业。' },
-  { key: '3', id: 'SRV-2026-003', title: '城市空中观光体验飞行', category: '其他服务', provider: '星图测绘航拍公司', contact: '王工', phone: '13800008888', time: '2026-05-18 16:00:00', status: 'pending', billing: '按架次', price: '¥299/人', area: '郑州市核心城区', qualifications: ['民用无人驾驶航空器运营合格证', '低空旅游经营许可（试点）'], desc: '提供城市低空观光体验飞行。' },
-  { key: '4', id: 'SRV-2026-004', title: '无人机物流配送试点服务', category: '物流运输', provider: '星图测绘航拍公司', contact: '王工', phone: '13800008888', time: '2026-05-19 10:30:00', status: 'pending', billing: '面议', price: '¥50/单', area: '郑州市高新区', qualifications: ['民用无人驾驶航空器运营合格证'], desc: '基于大疆 FlyCart 30 提供中短距离配送服务试点。' },
-  { key: '5', id: 'SRV-2026-005', title: '高空清洗无人机服务', category: '其他服务', provider: '某清洁公司', contact: '刘经理', phone: '13912345678', time: '2026-05-10 09:00:00', status: 'rejected', billing: '按天', price: '¥800/次', area: '郑州市全域', qualifications: ['无相关资质证明'], desc: '使用自研高空清洗无人机为高层建筑提供清洗服务。', rejectReason: '服务资质文件不清晰，请重新上传高清版营业执照与相关资质证明后再次提交。', rejectTime: '2026-05-11 14:00:00' }
+  { key: '1', id: 'SRV-2026-001', title: '高精度无人机倾斜摄影与航拍测绘', category: '航拍测绘', provider: 'XX测绘科技有限公司', contact: '王经理', phone: '13811112222', time: '2026-04-20 14:00:00', status: 'normal', billing: '按面积', price: '¥800/平方公里', area: '浙江省全省', qualifications: ['测绘航空摄影乙级资质', '民用无人驾驶航空器运营合格证'], desc: '提供高精度正射影像及三维倾斜摄影模型构建服务。', auditHistory: [{ time: '2026-04-20 14:00:00', action: 'approve', operator: '高级审核员', remark: '资质核验通过，服务内容符合发布规范。' }] },
+  { key: '2', id: 'SRV-2026-002', title: '大面积农林植保喷洒作业', category: '农林植保', provider: '蓝天农业服务部', contact: '张总', phone: '13911113333', time: '2026-04-21 09:30:15', status: 'normal', billing: '按面积', price: '¥10/亩', area: '杭州市及周边', qualifications: ['民用无人驾驶航空器运营合格证'], desc: '采用大疆T40农业无人机，支持大面积喷洒作业。', auditHistory: [{ time: '2026-04-21 09:30:15', action: 'approve', operator: '系统自动审核', remark: '标准业务模板，合规条件通过。' }] },
+  { key: '3', id: 'SRV-2026-003', title: '城市空中观光体验飞行', category: '其他服务', provider: '星图测绘航拍公司', contact: '王工', phone: '13800008888', time: '2026-05-21 16:00:00', status: 'pending', billing: '按架次', price: '¥299/人', area: '郑州市核心城区', qualifications: ['民用无人驾驶航空器运营合格证', '低空旅游经营许可（试点）'], desc: '提供城市低空观光体验飞行。', auditHistory: [
+    { time: '2026-05-10 10:00:00', action: 'approve', operator: '审核专员A', remark: '首次提交：资质与经营范围契合，核准通过。' },
+    { time: '2026-05-18 14:00:00', action: 'offline', operator: '星图商户(前台自主下架)', remark: '下架原因：因直升机例行大修保养，暂停前台在线预约。' },
+    { time: '2026-05-21 16:00:00', action: 'submit', operator: '星图商户(重新申请发布)', remark: '检修保养全部合格，现申请重新上架发布服务。' }
+  ] },
+  { key: '4', id: 'SRV-2026-004', title: '无人机物流配送试点服务', category: '物流运输', provider: '星图测绘航拍公司', contact: '王工', phone: '13800008888', time: '2026-05-19 10:30:00', status: 'pending', billing: '面议', price: '¥50/单', area: '郑州市高新区', qualifications: ['民用无人驾驶航空器运营合格证'], desc: '基于大疆 FlyCart 30 提供中短距离配送服务试点。', auditHistory: [{ time: '2026-05-19 10:30:00', action: 'submit', operator: '星图商户', remark: '首次发布服务上架。' }] },
+  { key: '5', id: 'SRV-2026-005', title: '高空清洗无人机服务', category: '其他服务', provider: '某清洁公司', contact: '刘经理', phone: '13912345678', time: '2026-05-10 09:00:00', status: 'rejected', billing: '按天', price: '¥800/次', area: '郑州市全域', qualifications: ['无相关资质证明'], desc: '使用自研高空清洗无人机为高层建筑提供清洗服务。', rejectReason: '服务资质文件不清晰，请重新上传高清版营业执照与相关资质证明后再次提交。', rejectTime: '2026-05-11 14:00:00', auditHistory: [
+    { time: '2026-05-10 09:00:00', action: 'submit', operator: '商户账号', remark: '首次提交发布申请。' },
+    { time: '2026-05-11 14:00:00', action: 'reject', operator: '系统审核员', remark: '服务资质文件不清晰，请重新上传高清版营业执照与相关资质证明后再次提交。' }
+  ] }
 ];
 
 var STATUS_LABEL: Record<string, string> = { normal: '已通过', pending: '待审核', rejected: '已驳回' };
 var STATUS_COLOR: Record<string, string> = { normal: 'green', pending: 'orange', rejected: 'red' };
 
 var Component = function AdminServicePage() {
+  var [serviceData, setServiceData] = useState(SERVICE_DATA);
   var [activeTab, setActiveTab] = useState('all');
   var [viewOpen, setViewOpen] = useState(false);
-  var [auditOpen, setAuditOpen] = useState(false);
   var [currentRecord, setCurrentRecord] = useState<any>(null);
   var [rejectReason, setRejectReason] = useState('');
 
-  var handleApprove = function () { message.success('审核通过！该服务已上架展示。'); setAuditOpen(false); };
-  var handleReject = function () { if (!rejectReason.trim()) { message.warning('请输入驳回原因'); return; } message.success('已驳回该服务申请。'); setAuditOpen(false); setRejectReason(''); };
+  var handleApprove = function () {
+    if (currentRecord) {
+      var auditTime = '2026-05-21 17:46:00';
+      setServiceData(function (prev) {
+        return prev.map(function (item) {
+          if (item.key === currentRecord.key) {
+            var history = item.auditHistory ? [].concat(item.auditHistory) : [];
+            history.push({
+              time: auditTime,
+              action: 'approve',
+              operator: '当前管理员',
+              remark: '运营审核通过，同意发布上线。'
+            });
+            return Object.assign({}, item, { status: 'normal', auditHistory: history });
+          }
+          return item;
+        });
+      });
+      message.success('审核通过！该服务已上架展示。');
+      setViewOpen(false);
+    }
+  };
+
+  var handleReject = function () {
+    if (!rejectReason.trim()) { message.warning('请输入驳回原因'); return; }
+    if (currentRecord) {
+      var auditTime = '2026-05-21 17:46:00';
+      setServiceData(function (prev) {
+        return prev.map(function (item) {
+          if (item.key === currentRecord.key) {
+            var history = item.auditHistory ? [].concat(item.auditHistory) : [];
+            history.push({
+              time: auditTime,
+              action: 'reject',
+              operator: '当前管理员',
+              remark: rejectReason
+            });
+            return Object.assign({}, item, {
+              status: 'rejected',
+              rejectReason: rejectReason,
+              rejectTime: auditTime,
+              auditHistory: history
+            });
+          }
+          return item;
+        });
+      });
+      message.success('已驳回该服务申请。');
+      setViewOpen(false);
+      setRejectReason('');
+    }
+  };
 
   var columns = [
     { title: '服务编号', dataIndex: 'id', key: 'id', width: 130 },
@@ -40,18 +97,18 @@ var Component = function AdminServicePage() {
     { title: '操作', key: 'action', width: 120, fixed: 'right' as const, render: function (_: any, record: any) {
       return (<Space size={4}>
         <Tooltip title="查看详情"><Button type="text" size="small" icon={<EyeOutlined />} style={{ color: '#1677ff' }} onClick={function () { setCurrentRecord(record); setViewOpen(true); }} /></Tooltip>
-        {record.status === 'pending' && (<Tooltip title="审核处理"><Button type="text" size="small" icon={<AuditOutlined />} style={{ color: '#722ed1' }} onClick={function () { setCurrentRecord(record); setRejectReason(''); setAuditOpen(true); }} /></Tooltip>)}
+        {record.status === 'pending' && (<Tooltip title="审核处理"><Button type="text" size="small" icon={<AuditOutlined />} style={{ color: '#722ed1' }} onClick={function () { setCurrentRecord(record); setRejectReason(''); setViewOpen(true); }} /></Tooltip>)}
       </Space>);
     }}
   ];
 
   var tabItems = [
-    { key: 'all', label: '全部 (' + SERVICE_DATA.length + ')' },
-    { key: 'pending', label: '待审核 (' + SERVICE_DATA.filter(function (d) { return d.status === 'pending'; }).length + ')' },
-    { key: 'normal', label: '已通过 (' + SERVICE_DATA.filter(function (d) { return d.status === 'normal'; }).length + ')' },
-    { key: 'rejected', label: '已驳回 (' + SERVICE_DATA.filter(function (d) { return d.status === 'rejected'; }).length + ')' }
+    { key: 'all', label: '全部 (' + serviceData.length + ')' },
+    { key: 'pending', label: '待审核 (' + serviceData.filter(function (d) { return d.status === 'pending'; }).length + ')' },
+    { key: 'normal', label: '已通过 (' + serviceData.filter(function (d) { return d.status === 'normal'; }).length + ')' },
+    { key: 'rejected', label: '已驳回 (' + serviceData.filter(function (d) { return d.status === 'rejected'; }).length + ')' }
   ];
-  var filteredData = activeTab === 'all' ? SERVICE_DATA : SERVICE_DATA.filter(function (d) { return d.status === activeTab; });
+  var filteredData = activeTab === 'all' ? serviceData : serviceData.filter(function (d) { return d.status === activeTab; });
 
   return (
     <AdminLayout activeKey="admin-service">
@@ -69,7 +126,23 @@ var Component = function AdminServicePage() {
         </Card>
       </div>
 
-      <Modal title="低空服务详情" open={viewOpen} onCancel={function () { setViewOpen(false); }} width={800} footer={<Button onClick={function () { setViewOpen(false); }}>关闭</Button>}>
+      <Modal
+        title="低空服务详情"
+        open={viewOpen}
+        onCancel={function () { setViewOpen(false); }}
+        width={800}
+        footer={
+          currentRecord && currentRecord.status === 'pending' ? [
+            <Button key="close" onClick={function () { setViewOpen(false); }}>关闭</Button>,
+            <Button key="reject" danger onClick={handleReject} icon={<CloseCircleOutlined />}>驳回申请</Button>,
+            <Popconfirm key="approve" title="确认审核通过？" onConfirm={handleApprove}>
+              <Button type="primary" style={{ background: '#52c41a', borderColor: '#52c41a' }} icon={<CheckCircleOutlined />}>审核通过</Button>
+            </Popconfirm>
+          ] : [
+            <Button key="close" onClick={function () { setViewOpen(false); }}>关闭</Button>
+          ]
+        }
+      >
         {currentRecord && (
           <div style={{ marginTop: 16 }}>
             <div style={{ display: 'flex', gap: 16, marginBottom: 24, padding: 16, background: currentRecord.status === 'normal' ? '#f6ffed' : currentRecord.status === 'pending' ? '#fffbe6' : '#fff1f0', border: '1px solid', borderColor: currentRecord.status === 'normal' ? '#b7eb8f' : currentRecord.status === 'pending' ? '#ffe58f' : '#ffccc7', borderRadius: 8 }}>
@@ -90,28 +163,46 @@ var Component = function AdminServicePage() {
               <Descriptions.Item label="资质" span={2}>{currentRecord.qualifications.map(function(q: string) { return <Tag key={q} color={q === '无相关资质证明' ? 'red' : 'green'} style={{ marginRight: 4 }}>{q}</Tag>; })}</Descriptions.Item>
               <Descriptions.Item label="服务描述" span={2}>{currentRecord.desc}</Descriptions.Item>
             </Descriptions>
-            {currentRecord.status === 'rejected' && (<div style={{ padding: 16, background: '#fff2f0', border: '1px solid #ffccc7', borderRadius: 8 }}><div style={{ fontWeight: 600, color: '#cf1322', marginBottom: 8 }}><CloseCircleOutlined style={{ marginRight: 6 }} />驳回记录</div><Descriptions column={1} size="small"><Descriptions.Item label="驳回时间">{currentRecord.rejectTime}</Descriptions.Item><Descriptions.Item label="驳回原因">{currentRecord.rejectReason}</Descriptions.Item></Descriptions></div>)}
+            {currentRecord.status === 'rejected' && (<div style={{ padding: 16, background: '#fff2f0', border: '1px solid #ffccc7', borderRadius: 8, marginBottom: 16 }}><div style={{ fontWeight: 600, color: '#cf1322', marginBottom: 8 }}><CloseCircleOutlined style={{ marginRight: 6 }} />驳回记录</div><Descriptions column={1} size="small"><Descriptions.Item label="驳回时间">{currentRecord.rejectTime}</Descriptions.Item><Descriptions.Item label="驳回原因">{currentRecord.rejectReason}</Descriptions.Item></Descriptions></div>)}
+
+            {currentRecord.auditHistory && currentRecord.auditHistory.length > 0 && (
+              <div style={{ marginTop: 24, marginBottom: 24, padding: 16, background: '#f5f7fa', border: '1px solid #e4e7ed', borderRadius: 8 }}>
+                <div style={{ fontWeight: 600, color: '#002c8c', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <HistoryOutlined /> 历史审核与状态变更记录 (含下架重发历史)
+                </div>
+                <Timeline
+                  style={{ marginTop: 8 }}
+                  items={currentRecord.auditHistory.map(function (hist: any) {
+                    var color = hist.action === 'approve' ? 'green' : hist.action === 'reject' ? 'red' : hist.action === 'offline' ? 'gray' : 'blue';
+                    var label = hist.action === 'approve' ? '审批通过' : hist.action === 'reject' ? '审批驳回' : hist.action === 'offline' ? '自主下架' : '重新提交';
+                    return {
+                      color: color,
+                      children: (
+                        <div style={{ paddingBottom: 2 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 500, fontSize: 13 }}>
+                            <span>{label} <span style={{ color: '#8c8c8c', fontWeight: 'normal', fontSize: 12 }}>({hist.operator})</span></span>
+                            <span style={{ color: '#8c8c8c', fontWeight: 'normal', fontSize: 12 }}>{hist.time}</span>
+                          </div>
+                          {hist.remark && <div style={{ color: '#595959', marginTop: 4, fontSize: 12, background: '#ffffff', padding: '6px 12px', borderRadius: 4, border: '1px dashed #e8e8e8' }}>{hist.remark}</div>}
+                        </div>
+                      )
+                    };
+                  })}
+                />
+              </div>
+            )}
+
+            {currentRecord.status === 'pending' && (
+              <div style={{ marginTop: 24, padding: 16, background: '#fafafa', border: '1px solid #f0f0f0', borderRadius: 8 }}>
+                <div style={{ fontWeight: 600, color: '#722ed1', marginBottom: 12 }}>
+                  <AuditOutlined style={{ marginRight: 6 }} /> 审批意见
+                </div>
+                <div style={{ marginBottom: 8, fontSize: 13, color: '#595959' }}>如需驳回该服务申请，请在此处填写驳回原因：</div>
+                <Input.TextArea placeholder="例如：资质证书文件模糊，或者服务内容描述含有违规宣传字眼" rows={3} value={rejectReason} onChange={function (e) { setRejectReason(e.target.value); }} />
+              </div>
+            )}
           </div>
         )}
-      </Modal>
-
-      <Modal title={<span style={{ color: '#722ed1' }}><AuditOutlined style={{ marginRight: 8 }} />服务发布审核</span>} open={auditOpen} onCancel={function () { setAuditOpen(false); setRejectReason(''); }} width={640}
-        footer={[<Button key="cancel" onClick={function () { setAuditOpen(false); }}>取消</Button>, <Button key="reject" danger onClick={handleReject} icon={<CloseCircleOutlined />}>驳回申请</Button>, <Popconfirm key="approve" title="确认审核通过？" onConfirm={handleApprove}><Button type="primary" style={{ background: '#52c41a', borderColor: '#52c41a' }} icon={<CheckCircleOutlined />}>审核通过</Button></Popconfirm>]}>
-        {currentRecord && (<div>
-          <div style={{ padding: 16, background: '#fafafa', borderRadius: 8, marginBottom: 16 }}>
-            <Descriptions column={2} size="small">
-              <Descriptions.Item label="服务编号">{currentRecord.id}</Descriptions.Item>
-              <Descriptions.Item label="提交时间">{currentRecord.time}</Descriptions.Item>
-              <Descriptions.Item label="服务名称" span={2}><span style={{ fontWeight: 600 }}>{currentRecord.title}</span></Descriptions.Item>
-              <Descriptions.Item label="发布方">{currentRecord.provider}</Descriptions.Item>
-              <Descriptions.Item label="分类"><Tag color="blue">{currentRecord.category}</Tag></Descriptions.Item>
-              <Descriptions.Item label="报价">{currentRecord.price}</Descriptions.Item>
-              <Descriptions.Item label="区域">{currentRecord.area}</Descriptions.Item>
-            </Descriptions>
-          </div>
-          <div style={{ marginBottom: 8, fontWeight: 500, color: '#ff4d4f' }}>如需驳回，请填写驳回原因（必填）：</div>
-          <Input.TextArea placeholder="例如：资质文件缺失或过期、服务描述含有违规内容等" rows={3} value={rejectReason} onChange={function (e) { setRejectReason(e.target.value); }} />
-        </div>)}
       </Modal>
     </AdminLayout>
   );

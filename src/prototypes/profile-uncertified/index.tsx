@@ -1,15 +1,29 @@
 /**
  * @name 个人中心（未认证）
  * @mode axure
- * /Users/xu/Desktop/元引信息/Axhub-Make-main/skills/axure-export-workflow/SKILL.md
- *
  */
 
 import './style.css';
 
 import React, { useState, useCallback } from 'react';
-import { Card, Form, Input, Select, Button, Breadcrumb, Avatar, Descriptions, Tag, message, Row, Col, Modal, Alert, Result } from 'antd';
-import { HomeOutlined, UserOutlined, SafetyCertificateOutlined, ExclamationCircleOutlined, IdcardOutlined, PhoneOutlined, EnvironmentOutlined, RocketOutlined, TeamOutlined, ShopOutlined, CustomerServiceOutlined, BankOutlined } from '@ant-design/icons';
+import { Card, Form, Input, Select, Button, Breadcrumb, Avatar, Descriptions, Tag, message, Row, Col, Modal, Alert, Result, Progress, Divider } from 'antd';
+import { HomeOutlined, UserOutlined, SafetyCertificateOutlined, ExclamationCircleOutlined, IdcardOutlined, PhoneOutlined, EnvironmentOutlined, RocketOutlined, TeamOutlined, ShopOutlined, CustomerServiceOutlined, BankOutlined, LockOutlined, MailOutlined, MobileOutlined, EditOutlined, KeyOutlined } from '@ant-design/icons';
+
+var MENU_ITEMS = [
+  { key: 'profile-certified', label: '我的信息', group: '账号管理' },
+  { key: 'role-management', label: '角色管理' },
+  { key: 'message-center', label: '消息中心' },
+  { key: 'my-orders', label: '我的预约', group: '个人/需求方业务' },
+  { key: 'my-demand', label: '我的需求' },
+  { key: 'my-aircraft', label: '我的飞行器', group: '飞行服务 (飞手/企业)' },
+  { key: 'my-flight-plan', label: '我的飞行计划' },
+  { key: 'my-goods', label: '我的商品', group: '低空商城 (商户)' },
+  { key: 'mall-publish', label: '发布商品' },
+  { key: 'my-service', label: '我的服务', group: '低空服务 (飞行服务商)' },
+  { key: 'service-publish', label: '发布服务项目' },
+  { key: 'provider-orders', label: '服务受理单' },
+  { key: 'provider-intentions', label: '商品受理单' }
+];
 
 var ROLES = [
   { value: 'personal', label: '个人用户', color: '#1677ff', icon: <UserOutlined /> },
@@ -44,13 +58,36 @@ var PRODUCT_CATEGORIES = [
   { value: 'other', label: '其他' }
 ];
 
+var getPasswordStrength = function (pwd: string) {
+  if (!pwd) return { level: 0, text: '', color: '#d9d9d9' };
+  var score = 0;
+  if (pwd.length >= 8) score++;
+  if (/[A-Z]/.test(pwd)) score++;
+  if (/[0-9]/.test(pwd)) score++;
+  if (/[^A-Za-z0-9]/.test(pwd)) score++;
+  if (score <= 1) return { level: 33, text: '弱', color: '#ff4d4f' };
+  if (score <= 2) return { level: 66, text: '中', color: '#faad14' };
+  return { level: 100, text: '强', color: '#52c41a' };
+};
+
 var Component = function ProfileUncertifiedPage() {
   var [editMode, setEditMode] = useState(false);
   var [certOpen, setCertOpen] = useState(false);
   var [certStep, setCertStep] = useState(0);
   var [selectedRole, setSelectedRole] = useState('');
+  var [passwordOpen, setPasswordOpen] = useState(false);
+  var [passwordLoading, setPasswordLoading] = useState(false);
+  var [newPassword, setNewPassword] = useState('');
+  var [phoneOpen, setPhoneOpen] = useState(false);
+  var [phoneCooldown, setPhoneCooldown] = useState(0);
+  var [emailOpen, setEmailOpen] = useState(false);
+  var [emailCooldown, setEmailCooldown] = useState(0);
+  
   var [form] = Form.useForm();
   var [certForm] = Form.useForm();
+  var [pwdForm] = Form.useForm();
+  var [phoneForm] = Form.useForm();
+  var [emailForm] = Form.useForm();
 
   var handleNavigate = useCallback(function (key: string) {
     window.location.href = '/prototypes/' + key;
@@ -76,6 +113,47 @@ var Component = function ProfileUncertifiedPage() {
       message.success('认证信息已提交！');
     }).catch(function () {});
   }, [certForm]);
+
+  var passwordStrength = getPasswordStrength(newPassword);
+
+  var handlePasswordSubmit = function () {
+    pwdForm.validateFields().then(function (values: any) {
+      if (values.newPassword !== values.confirmPassword) {
+        message.error('两次输入的新密码不一致！');
+        return;
+      }
+      setPasswordLoading(true);
+      setTimeout(function () {
+        setPasswordLoading(false);
+        setPasswordOpen(false);
+        setNewPassword('');
+        pwdForm.resetFields();
+        message.success('密码修改成功！请使用新密码重新登录。');
+      }, 1500);
+    }).catch(function () {});
+  };
+
+  var startPhoneCooldown = function () {
+    setPhoneCooldown(60);
+    var timer = setInterval(function () {
+      setPhoneCooldown(function (prev: number) {
+        if (prev <= 1) { clearInterval(timer); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+    message.success('验证码已发送至您的手机');
+  };
+
+  var startEmailCooldown = function () {
+    setEmailCooldown(60);
+    var timer = setInterval(function () {
+      setEmailCooldown(function (prev: number) {
+        if (prev <= 1) { clearInterval(timer); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+    message.success('验证码已发送至您的邮箱');
+  };
 
   var roleLabel = ROLES.find(function (r) { return r.value === selectedRole; });
 
@@ -212,10 +290,43 @@ var Component = function ProfileUncertifiedPage() {
         <Row gutter={24}>
           <Col xs={24} md={6}>
             <Card style={{ borderRadius: 12, marginBottom: 24 }}>
-              <div style={{ textAlign: 'center', marginBottom: 12 }}>
+              <div style={{ textAlign: 'center', marginBottom: 16 }}>
                 <Avatar size={80} icon={<UserOutlined />} style={{ backgroundColor: '#bfbfbf', marginBottom: 12 }} />
                 <div style={{ fontSize: 18, fontWeight: 600, color: '#1f1f1f' }}>新用户</div>
                 <Tag color="default" style={{ marginTop: 8 }}>未认证</Tag>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 12 }}>
+                  <Button size="small" type="link" icon={<EditOutlined />} onClick={function () { setEditMode(true); }}>修改资料</Button>
+                  <Button size="small" type="link" icon={<KeyOutlined />} onClick={function () { pwdForm.resetFields(); setNewPassword(''); setPasswordOpen(true); }}>修改密码</Button>
+                </div>
+              </div>
+              <div style={{ marginTop: 16, borderTop: '1px solid #f0f0f0', paddingTop: 16 }}>
+                {MENU_ITEMS.map(function (item) {
+                  var isActive = item.key === 'profile-certified';
+                  return (
+                    <div key={item.key}>
+                      {item.group ? <div style={{ fontSize: 11, color: '#bfbfbf', padding: '12px 16px 4px', fontWeight: 600, letterSpacing: 1 }}>{item.group}</div> : null}
+                      <div
+                        onClick={function () {
+                          if (item.key !== 'profile-certified') {
+                            handleNavigate(item.key);
+                          }
+                        }}
+                        style={{
+                          padding: '10px 16px',
+                          borderRadius: 8,
+                          cursor: 'pointer',
+                          background: isActive ? '#fff0f6' : 'transparent',
+                          color: isActive ? '#eb2f96' : '#595959',
+                          fontWeight: isActive ? 600 : 400,
+                          fontSize: 14,
+                          marginBottom: 4
+                        }}
+                      >
+                        {item.label}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </Card>
           </Col>
@@ -226,7 +337,7 @@ var Component = function ProfileUncertifiedPage() {
               style={{ borderRadius: 12, marginBottom: 24 }}
             >
               {editMode ? (
-                <Form form={form} layout="vertical" initialValues={{ name: 'dk20260001', phone: '138****8888', email: '' }}>
+                <Form form={form} layout="vertical" initialValues={{ name: '新用户', phone: '138****8888', email: '' }}>
                   <Row gutter={16}>
                     <Col span={12}><Form.Item name="name" label="昵称" rules={[{ required: true }]}><Input size="large" /></Form.Item></Col>
                     <Col span={12}><Form.Item name="phone" label="联系电话" rules={[{ required: true }]}><Input size="large" /></Form.Item></Col>
@@ -247,51 +358,44 @@ var Component = function ProfileUncertifiedPage() {
               )}
             </Card>
 
-            <Card
-              title="认证信息"
-              style={{ borderRadius: 12, marginBottom: 24 }}
-              extra={<Button type="primary" icon={<SafetyCertificateOutlined />} onClick={function () { certForm.resetFields(); setCertStep(0); setSelectedRole(''); setCertOpen(true); }}>立即认证</Button>}
-            >
-              <Alert
-                type="warning"
-                showIcon
-                icon={<ExclamationCircleOutlined />}
-                title="您尚未完成角色认证"
-                description="完成角色认证后，即可使用飞行器备案、飞行计划申报、服务预约、商品购买等平台完整功能。"
-                style={{ marginBottom: 16 }}
-              />
-              <Descriptions column={2} bordered>
-                <Descriptions.Item label="认证状态"><Tag color="default">未认证</Tag></Descriptions.Item>
-                <Descriptions.Item label="认证类型">未选择</Descriptions.Item>
-                <Descriptions.Item label="认证时间">—</Descriptions.Item>
-                <Descriptions.Item label="认证编号">—</Descriptions.Item>
-              </Descriptions>
-            </Card>
-
-            <Card title="角色说明" style={{ borderRadius: 12, marginBottom: 24 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {[
-                  { icon: <UserOutlined />, color: '#1677ff', label: '个人用户', desc: '面向普通公众用户，可浏览资讯公告、政策法规，预约低空服务、购买商城商品等基础功能。' },
-                  { icon: <RocketOutlined />, color: '#52c41a', label: '飞手', desc: '面向持证无人机驾驶员，可进行飞行器备案、飞行计划申报、查看空域信息等专业飞行服务。' },
-                  { icon: <TeamOutlined />, color: '#722ed1', label: '企业用户', desc: '面向无人机相关企业，支持企业资质认证、批量飞行器备案、团队飞行计划管理等功能。' },
-                  { icon: <CustomerServiceOutlined />, color: '#13c2c2', label: '飞行服务商', desc: '面向低空飞行服务提供方，可发布服务项目、管理订单、提供航拍/巡检/物流等专业服务。' },
-                  { icon: <ShopOutlined />, color: '#fa8c16', label: '商户', desc: '面向无人机产品销售方，可入驻商城发布商品、管理库存、处理订单和售后等电商业务。' },
-                  { icon: <BankOutlined />, color: '#1677ff', label: '政府部门', desc: '面向监管机构和管理部门，可审批飞行主体、飞行器、飞行计划，管理空域信息和发布政策。' }
-                ].map(function (role) {
-                  return (
-                    <div key={role.label} style={{ padding: '14px 16px', background: '#fafafa', borderRadius: 8, display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                      <div style={{ color: role.color, fontSize: 22, marginTop: 2, flexShrink: 0 }}>{role.icon}</div>
-                      <div>
-                        <div style={{ fontSize: 14, fontWeight: 600, color: '#1f1f1f', marginBottom: 4 }}>{role.label}</div>
-                        <div style={{ fontSize: 13, color: '#8c8c8c', lineHeight: 1.6 }}>{role.desc}</div>
-                      </div>
+            {/* 账号安全设置 */}
+            <Card title="账号安全设置" style={{ borderRadius: 12, marginBottom: 24 }} extra={<Tag color="green"><LockOutlined /> 安全等级：一般</Tag>}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                {/* 登录密码 */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 0', borderBottom: '1px solid #f0f0f0' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 8, background: '#e6f4ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LockOutlined style={{ fontSize: 18, color: '#1677ff' }} /></div>
+                    <div>
+                      <div style={{ fontWeight: 500, fontSize: 14 }}>登录密码</div>
+                      <div style={{ fontSize: 12, color: '#8c8c8c' }}>已设置。建议定期更换密码以保障账户安全。</div>
                     </div>
-                  );
-                })}
+                  </div>
+                  <Button type="link" onClick={function () { pwdForm.resetFields(); setNewPassword(''); setPasswordOpen(true); }}>修改密码</Button>
+                </div>
+                {/* 安全手机 */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 0', borderBottom: '1px solid #f0f0f0' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 8, background: '#f6ffed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><MobileOutlined style={{ fontSize: 18, color: '#52c41a' }} /></div>
+                    <div>
+                      <div style={{ fontWeight: 500, fontSize: 14 }}>绑定手机</div>
+                      <div style={{ fontSize: 12, color: '#8c8c8c' }}>已绑定。当前绑定手机：138****8888</div>
+                    </div>
+                  </div>
+                  <Button type="link" onClick={function () { phoneForm.resetFields(); setPhoneCooldown(0); setPhoneOpen(true); }}>更换手机</Button>
+                </div>
+                {/* 安全邮箱 */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 0' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 8, background: '#fff7e6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><MailOutlined style={{ fontSize: 18, color: '#fa8c16' }} /></div>
+                    <div>
+                      <div style={{ fontWeight: 500, fontSize: 14 }}>安全邮箱</div>
+                      <div style={{ fontSize: 12, color: '#8c8c8c' }}>未设置安全邮箱。</div>
+                    </div>
+                  </div>
+                  <Button type="link" onClick={function () { emailForm.resetFields(); setEmailCooldown(0); setEmailOpen(true); }}>绑定邮箱</Button>
+                </div>
               </div>
             </Card>
-
-
           </Col>
         </Row>
       </div>
@@ -348,6 +452,86 @@ var Component = function ProfileUncertifiedPage() {
             subTitle="管理员将在 1-3 个工作日内完成审核，审核通过后您可使用平台全部功能。"
           />
         )}
+      </Modal>
+
+      {/* 修改密码 Modal */}
+      <Modal
+        title={<span><LockOutlined style={{ marginRight: 8 }} />修改登录密码</span>}
+        open={passwordOpen}
+        onCancel={function () { setPasswordOpen(false); setNewPassword(''); pwdForm.resetFields(); }}
+        onOk={handlePasswordSubmit}
+        confirmLoading={passwordLoading}
+        okText="确认修改"
+        width={480}
+      >
+        <Form form={pwdForm} layout="vertical" style={{ marginTop: 16 }}>
+          <Form.Item name="oldPassword" label="当前密码" rules={[{ required: true, message: '请输入当前密码' }]}>
+            <Input.Password size="large" placeholder="请输入当前密码" />
+          </Form.Item>
+          <Form.Item name="newPassword" label="新密码" rules={[{ required: true, message: '请输入新密码' }, { min: 8, message: '密码长度不少于8位' }]}>
+            <Input.Password size="large" placeholder="请输入新密码（至少8位）" onChange={function (e) { setNewPassword(e.target.value); }} />
+          </Form.Item>
+          {newPassword && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <span style={{ fontSize: 12, color: '#8c8c8c' }}>密码强度：</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: passwordStrength.color }}>{passwordStrength.text}</span>
+              </div>
+              <Progress percent={passwordStrength.level} showInfo={false} strokeColor={passwordStrength.color} size="small" />
+              <div style={{ fontSize: 11, color: '#bfbfbf', marginTop: 4 }}>建议包含大写字母、数字和特殊字符</div>
+            </div>
+          )}
+          <Form.Item name="confirmPassword" label="确认新密码" rules={[{ required: true, message: '请再次输入新密码' }]}>
+            <Input.Password size="large" placeholder="请再次输入新密码" />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* 更换手机 Modal */}
+      <Modal
+        title={<span><MobileOutlined style={{ marginRight: 8 }} />更换绑定手机</span>}
+        open={phoneOpen}
+        onCancel={function () { setPhoneOpen(false); }}
+        onOk={function () { phoneForm.validateFields().then(function () { message.success('手机号更换成功！'); setPhoneOpen(false); }).catch(function () {}); }}
+        okText="确认更换"
+        width={480}
+      >
+        <Form form={phoneForm} layout="vertical" style={{ marginTop: 16 }}>
+          <Form.Item label="当前手机号">
+            <Input size="large" value="138****8888" disabled />
+          </Form.Item>
+          <Form.Item name="newPhone" label="新手机号" rules={[{ required: true, message: '请输入新手机号' }]}>
+            <Input size="large" placeholder="请输入新手机号" />
+          </Form.Item>
+          <Form.Item name="verifyCode" label="验证码" rules={[{ required: true, message: '请输入验证码' }]}>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Input size="large" placeholder="请输入短信验证码" style={{ flex: 1 }} />
+              <Button size="large" disabled={phoneCooldown > 0} onClick={startPhoneCooldown}>{phoneCooldown > 0 ? phoneCooldown + 's 后重试' : '获取验证码'}</Button>
+            </div>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* 更换邮箱 Modal */}
+      <Modal
+        title={<span><MailOutlined style={{ marginRight: 8 }} />绑定安全邮箱</span>}
+        open={emailOpen}
+        onCancel={function () { setEmailOpen(false); }}
+        onOk={function () { emailForm.validateFields().then(function () { message.success('安全邮箱绑定成功！'); setEmailOpen(false); }).catch(function () {}); }}
+        okText="确认绑定"
+        width={480}
+      >
+        <Form form={emailForm} layout="vertical" style={{ marginTop: 16 }}>
+          <Form.Item name="newEmail" label="安全邮箱地址" rules={[{ required: true, message: '请输入安全邮箱' }, { type: 'email', message: '请输入有效的邮箱地址' }]}>
+            <Input size="large" placeholder="请输入安全邮箱地址" />
+          </Form.Item>
+          <Form.Item name="emailCode" label="验证码" rules={[{ required: true, message: '请输入验证码' }]}>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Input size="large" placeholder="请输入邮箱验证码" style={{ flex: 1 }} />
+              <Button size="large" disabled={emailCooldown > 0} onClick={startEmailCooldown}>{emailCooldown > 0 ? emailCooldown + 's 后重试' : '获取验证码'}</Button>
+            </div>
+          </Form.Item>
+        </Form>
       </Modal>
     </div>
   );
