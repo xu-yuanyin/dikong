@@ -6,7 +6,7 @@ import './style.css';
 import React, { useState } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import { Card, Table, Tag, Button, Breadcrumb, Space, Modal, Input, Select, message, Tooltip, Descriptions, Tabs, Popconfirm, Divider, Timeline } from 'antd';
-import { EyeOutlined, SearchOutlined, CheckCircleOutlined, SoundOutlined, AuditOutlined, CloseCircleOutlined, UserOutlined, HistoryOutlined } from '@ant-design/icons';
+import { EyeOutlined, SearchOutlined, CheckCircleOutlined, SoundOutlined, AuditOutlined, CloseCircleOutlined, UserOutlined, HistoryOutlined, CompassOutlined, ClockCircleOutlined, PhoneOutlined } from '@ant-design/icons';
 
 var DEMAND_TYPES = [
   { value: 'tourism', label: '低空旅游' }, { value: 'training', label: '飞行培训' },
@@ -39,10 +39,32 @@ var STATUS_COLOR: Record<string, string> = { normal: 'green', pending: 'orange',
 
 var Component = function AdminDemandPage() {
   var [demandData, setDemandData] = useState(DEMAND_DATA);
+  var [activeCategory, setActiveCategory] = useState('service'); // 'service' | 'goods'
   var [activeTab, setActiveTab] = useState('all');
   var [viewOpen, setViewOpen] = useState(false);
   var [currentRecord, setCurrentRecord] = useState<any>(null);
   var [rejectReason, setRejectReason] = useState('');
+
+  // 检索受控状态
+  var [searchQuery, setSearchQuery] = useState('');
+  var [searchStatus, setSearchStatus] = useState<any>(undefined);
+
+  // 过滤后的检索触发状态（点击检索后更新，或直接实时过滤）
+  var [filterText, setFilterText] = useState('');
+  var [filterStatus, setFilterStatus] = useState<any>(undefined);
+
+  var handleSearch = function () {
+    setFilterText(searchQuery);
+    setFilterStatus(searchStatus);
+  };
+
+  var handleReset = function () {
+    setSearchQuery('');
+    setSearchStatus(undefined);
+    setFilterText('');
+    setFilterStatus(undefined);
+    setActiveTab('all');
+  };
 
   var handleApprove = function () {
     if (currentRecord) {
@@ -99,9 +121,21 @@ var Component = function AdminDemandPage() {
 
   var columns = [
     { title: '需求编号', dataIndex: 'id', key: 'id', width: 130 },
-    { title: '需求标题', dataIndex: 'title', key: 'title', width: 220, render: function (t: string) { return <span style={{ fontWeight: 500, color: '#1677ff' }}>{t}</span>; } },
-    { title: '主类别', dataIndex: 'type', key: 'type', width: 100, render: function (t: string) { return <Tag color={t === '采购需求' ? 'purple' : 'blue'}>{t}</Tag>; } },
-    { title: '预算', dataIndex: 'budget', key: 'budget', width: 120, render: function (b: string) { return <span style={{ color: '#fa8c16', fontWeight: 500 }}>{b}</span>; } },
+    { 
+      title: activeCategory === 'service' ? '需求标题' : '采购标题', 
+      dataIndex: 'title', 
+      key: 'title', 
+      width: 280, 
+      render: function (t: string) { return <span style={{ fontWeight: 500, color: '#1677ff' }}>{t}</span>; } 
+    },
+    { 
+      title: activeCategory === 'service' ? '需求类型' : '产品类型', 
+      dataIndex: 'subType', 
+      key: 'subType', 
+      width: 150, 
+      render: function (t: string) { return <Tag color={activeCategory === 'goods' ? 'purple' : 'blue'}>{t}</Tag>; } 
+    },
+    { title: '意向预算', dataIndex: 'budget', key: 'budget', width: 120, render: function (b: string) { return <span style={{ color: '#fa8c16', fontWeight: 500 }}>{b}</span>; } },
     { title: '发布方', dataIndex: 'publisher', key: 'publisher', width: 160 },
     { title: '发布时间', dataIndex: 'time', key: 'time', width: 150 },
     { title: '状态', dataIndex: 'status', key: 'status', width: 100, render: function (s: string) { return <Tag color={STATUS_COLOR[s] || 'default'}>{STATUS_LABEL[s] || s}</Tag>; } },
@@ -113,36 +147,69 @@ var Component = function AdminDemandPage() {
     }}
   ];
 
+  // 1. 过滤大分类下的数据
+  var categoryData = demandData.filter(function (d) {
+    return activeCategory === 'service' ? d.type === '服务需求' : d.type === '采购需求';
+  });
+
+  // 2. 根据状态及检索词过滤
+  var filteredData = categoryData.filter(function (d) {
+    var matchTabStatus = activeTab === 'all' || d.status === activeTab;
+    
+    var matchSearchText = !filterText || 
+      d.id.toLowerCase().indexOf(filterText.toLowerCase()) > -1 ||
+      d.title.toLowerCase().indexOf(filterText.toLowerCase()) > -1 ||
+      d.publisher.toLowerCase().indexOf(filterText.toLowerCase()) > -1;
+      
+    var matchSearchStatus = !filterStatus || d.status === filterStatus;
+    
+    return matchTabStatus && matchSearchText && matchSearchStatus;
+  });
+
   var tabItems = [
-    { key: 'all', label: '全部 (' + demandData.length + ')' },
-    { key: 'pending', label: '待审核 (' + demandData.filter(function (d) { return d.status === 'pending'; }).length + ')' },
-    { key: 'normal', label: '已通过 (' + demandData.filter(function (d) { return d.status === 'normal'; }).length + ')' },
-    { key: 'rejected', label: '已驳回 (' + demandData.filter(function (d) { return d.status === 'rejected'; }).length + ')' }
+    { key: 'all', label: '全部 (' + categoryData.length + ')' },
+    { key: 'pending', label: '待审核 (' + categoryData.filter(function (d) { return d.status === 'pending'; }).length + ')' },
+    { key: 'normal', label: '已通过 (' + categoryData.filter(function (d) { return d.status === 'normal'; }).length + ')' },
+    { key: 'rejected', label: '已驳回 (' + categoryData.filter(function (d) { return d.status === 'rejected'; }).length + ')' }
   ];
-  var filteredData = activeTab === 'all' ? demandData : demandData.filter(function (d) { return d.status === activeTab; });
 
   return (
     <AdminLayout activeKey="admin-demand">
       <div style={{ maxWidth: 1400, margin: '0 auto', padding: 24 }}>
         <Breadcrumb items={[{ title: '业务审核' }, { title: '需求发布审核' }]} style={{ marginBottom: 16 }} />
+        
+        <Tabs 
+          activeKey={activeCategory} 
+          onChange={function (key) { setActiveCategory(key); setActiveTab('all'); }} 
+          items={[
+            { key: 'service', label: '服务需求监管' },
+            { key: 'goods', label: '商品采购需求监管' }
+          ]} 
+          style={{ marginBottom: 16, background: '#fff', padding: '0 16px', borderRadius: 8 }}
+        />
+
         <Card style={{ borderRadius: 12 }}>
           <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
-            <Input prefix={<SearchOutlined />} placeholder="搜索需求编号/标题/发布方" style={{ width: 240 }} allowClear />
-            <Select placeholder="主类别" style={{ width: 120 }} options={[{ value: '1', label: '采购需求' }, { value: '2', label: '服务需求' }]} allowClear />
-            <Select placeholder="审核状态" style={{ width: 120 }} options={[{ value: 'pending', label: '待审核' }, { value: 'normal', label: '已通过' }, { value: 'rejected', label: '已驳回' }]} allowClear />
-            <Button type="primary" icon={<SearchOutlined />}>检索</Button>
-            <Button>重置</Button>
+            <Input prefix={<SearchOutlined />} placeholder="搜索需求编号/标题/发布方" style={{ width: 240 }} value={searchQuery} onChange={function (e) { setSearchQuery(e.target.value); }} onPressEnter={handleSearch} allowClear />
+            <Select placeholder="审核状态" style={{ width: 120 }} options={[{ value: 'pending', label: '待审核' }, { value: 'normal', label: '已通过' }, { value: 'rejected', label: '已驳回' }]} value={searchStatus} onChange={setSearchStatus} allowClear />
+            <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>检索</Button>
+            <Button onClick={handleReset}>重置</Button>
           </div>
           <Tabs activeKey={activeTab} onChange={setActiveTab} items={tabItems} style={{ marginBottom: 0 }} />
-          <Table columns={columns} dataSource={filteredData} pagination={{ pageSize: 10, total: filteredData.length, showTotal: function(t){return '共 '+t+' 项需求';} }} scroll={{ x: 1100 }} />
+          <Table columns={columns} dataSource={filteredData} pagination={{ pageSize: 10, total: filteredData.length, showTotal: function(t){return '共 '+t+' 项';} }} scroll={{ x: 1100 }} />
         </Card>
       </div>
 
       <Modal
-        title="需求详情"
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <SoundOutlined style={{ color: '#1677ff' }} />
+            <span>需求发布审核详情</span>
+          </div>
+        }
         open={viewOpen}
         onCancel={function () { setViewOpen(false); }}
-        width={800}
+        width={850}
         footer={
           currentRecord && currentRecord.status === 'pending' ? [
             <Button key="close" onClick={function () { setViewOpen(false); }}>关闭</Button>,
@@ -159,35 +226,74 @@ var Component = function AdminDemandPage() {
           <div style={{ marginTop: 16 }}>
             <div style={{ display: 'flex', gap: 16, marginBottom: 24, padding: 16, background: currentRecord.status === 'normal' ? '#f6ffed' : currentRecord.status === 'pending' ? '#fffbe6' : '#fff1f0', border: '1px solid', borderColor: currentRecord.status === 'normal' ? '#b7eb8f' : currentRecord.status === 'pending' ? '#ffe58f' : '#ffccc7', borderRadius: 8 }}>
               <SoundOutlined style={{ fontSize: 40, color: currentRecord.status === 'normal' ? '#52c41a' : currentRecord.status === 'pending' ? '#fa8c16' : '#ff4d4f', padding: 8 }} />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 4 }}>{currentRecord.title}<Tag color={STATUS_COLOR[currentRecord.status]} style={{ marginLeft: 12 }}>{STATUS_LABEL[currentRecord.status]}</Tag></div>
-                <div style={{ color: '#595959', fontSize: 13 }}>编号: {currentRecord.id} | 发布时间: {currentRecord.time}</div>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 4 }}>
+                  {currentRecord.title}
+                  <Tag color={STATUS_COLOR[currentRecord.status]} style={{ marginLeft: 12 }}>{STATUS_LABEL[currentRecord.status]}</Tag>
+                </div>
+                <div style={{ color: '#595959', fontSize: 13 }}>需求编号: <code>{currentRecord.id}</code> | 发布时间: {currentRecord.time}</div>
               </div>
-              <div style={{ textAlign: 'right' }}><div style={{ fontSize: 12, color: '#8c8c8c' }}>意向预算</div><div style={{ fontSize: 20, fontWeight: 600, color: '#fa8c16' }}>{currentRecord.budget}</div></div>
+              <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div style={{ fontSize: 12, color: '#8c8c8c' }}>意向预算</div>
+                <div style={{ fontSize: 22, fontWeight: 600, color: '#fa8c16' }}>{currentRecord.budget}</div>
+                <Tag color={currentRecord.type === '采购需求' ? 'purple' : 'blue'} style={{ marginRight: 0, marginTop: 4 }}>{currentRecord.type}</Tag>
+              </div>
             </div>
             <Descriptions column={2} bordered size="small" style={{ marginBottom: 16 }}>
-              <Descriptions.Item label="主类别"><Tag color={currentRecord.type === '采购需求' ? 'purple' : 'blue'}>{currentRecord.type}</Tag></Descriptions.Item>
-              <Descriptions.Item label="细分领域">{currentRecord.subType}</Descriptions.Item>
-              <Descriptions.Item label="需求区域">{currentRecord.area}</Descriptions.Item>
-              <Descriptions.Item label="期望完成时间">{currentRecord.expectedTime}</Descriptions.Item>
-              <Descriptions.Item label="发布方"><span style={{ fontWeight: 600 }}>{currentRecord.publisher}</span></Descriptions.Item>
-              <Descriptions.Item label="主体性质">{currentRecord.publisherType}</Descriptions.Item>
-              <Descriptions.Item label="联系人">{currentRecord.contact}</Descriptions.Item>
-              <Descriptions.Item label="联系电话">{currentRecord.phone}</Descriptions.Item>
-              <Descriptions.Item label="需求描述" span={2}>{currentRecord.desc}</Descriptions.Item>
+              <Descriptions.Item label={currentRecord.type === '采购需求' ? "产品类型" : "需求类型"}>
+                <Tag color={currentRecord.type === '采购需求' ? 'purple' : 'blue'}>{currentRecord.subType}</Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label={currentRecord.type === '采购需求' ? "意向收货区域" : "期望服务区域"}>
+                <span><CompassOutlined style={{ color: '#1677ff', marginRight: 4 }} />{currentRecord.area}</span>
+              </Descriptions.Item>
+              <Descriptions.Item label={currentRecord.type === '采购需求' ? "期望交付日期" : "期望完成时间"}>
+                <span><ClockCircleOutlined style={{ color: '#fa8c16', marginRight: 4 }} />{currentRecord.expectedTime}</span>
+              </Descriptions.Item>
+              <Descriptions.Item label="发布主体/单位">
+                <span>{currentRecord.publisher} <Tag style={{ marginLeft: 4 }}>{currentRecord.publisherType}</Tag></span>
+              </Descriptions.Item>
+              <Descriptions.Item label="联系人及方式" span={2}>
+                <div style={{ display: 'flex', gap: 16 }}>
+                  <span><UserOutlined style={{ color: '#8c8c8c', marginRight: 4 }} />{currentRecord.contact}</span>
+                  <span><PhoneOutlined style={{ color: '#8c8c8c', marginRight: 4 }} />{currentRecord.phone}</span>
+                </div>
+              </Descriptions.Item>
+              <Descriptions.Item label={currentRecord.type === '采购需求' ? "采购需求详细描述" : "服务需求详细描述"} span={2}>
+                <div style={{ whiteSpace: 'pre-wrap', color: '#595959', background: '#fafafa', padding: 12, borderRadius: 6, border: '1px solid #f0f0f0', lineHeight: 1.8, maxHeight: 150, overflowY: 'auto' }}>
+                  {currentRecord.desc}
+                </div>
+              </Descriptions.Item>
             </Descriptions>
-            {currentRecord.status === 'rejected' && (<div style={{ padding: 16, background: '#fff2f0', border: '1px solid #ffccc7', borderRadius: 8, marginBottom: 16 }}><div style={{ fontWeight: 600, color: '#cf1322', marginBottom: 8 }}><CloseCircleOutlined style={{ marginRight: 6 }} />驳回记录</div><Descriptions column={1} size="small"><Descriptions.Item label="驳回时间">{currentRecord.rejectTime}</Descriptions.Item><Descriptions.Item label="驳回原因">{currentRecord.rejectReason}</Descriptions.Item></Descriptions></div>)}
-
             {currentRecord.auditHistory && currentRecord.auditHistory.length > 0 && (
               <div style={{ marginTop: 24, marginBottom: 24, padding: 16, background: '#f5f7fa', border: '1px solid #e4e7ed', borderRadius: 8 }}>
-                <div style={{ fontWeight: 600, color: '#002c8c', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <HistoryOutlined /> 历史审核与状态变更记录 (含下架重发历史)
+                <div style={{ fontWeight: 600, color: '#002c8c', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 6, fontSize: 14 }}>
+                  <HistoryOutlined /> 历史审批与重新提交记录
                 </div>
                 <Timeline
                   style={{ marginTop: 8 }}
-                  items={currentRecord.auditHistory.map(function (hist: any) {
+                  items={currentRecord.auditHistory.map(function (hist: any, idx: number) {
                     var color = hist.action === 'approve' ? 'green' : hist.action === 'reject' ? 'red' : hist.action === 'offline' ? 'gray' : 'blue';
-                    var label = hist.action === 'approve' ? '审批通过' : hist.action === 'reject' ? '审批驳回' : hist.action === 'offline' ? '自主下架' : '重新提交';
+                    
+                    var firstSubmitIdx = currentRecord.auditHistory.findIndex(function (h: any) {
+                      return h.action === 'submit';
+                    });
+                    
+                    var submitTotalIndex = currentRecord.auditHistory.slice(0, idx + 1).filter(function (h: any) {
+                      return h.action === 'submit';
+                    }).length;
+                    
+                    var isResubmit = hist.action === 'submit' && idx !== firstSubmitIdx;
+                    
+                    var label = hist.action === 'approve'
+                      ? '审批通过'
+                      : hist.action === 'reject'
+                        ? '审批驳回'
+                        : hist.action === 'offline'
+                          ? '自主下架'
+                          : (isResubmit ? ('第' + submitTotalIndex + '次提交') : '首次提交');
+                    
+                    var showRemark = hist.remark && !isResubmit;
+                    
                     return {
                       color: color,
                       children: (
@@ -196,7 +302,7 @@ var Component = function AdminDemandPage() {
                             <span>{label} <span style={{ color: '#8c8c8c', fontWeight: 'normal', fontSize: 12 }}>({hist.operator})</span></span>
                             <span style={{ color: '#8c8c8c', fontWeight: 'normal', fontSize: 12 }}>{hist.time}</span>
                           </div>
-                          {hist.remark && <div style={{ color: '#595959', marginTop: 4, fontSize: 12, background: '#ffffff', padding: '6px 12px', borderRadius: 4, border: '1px dashed #e8e8e8' }}>{hist.remark}</div>}
+                          {showRemark && <div style={{ color: '#595959', marginTop: 4, fontSize: 12, background: '#ffffff', padding: '8px 12px', borderRadius: 6, border: '1px dashed #e8e8e8' }}>{hist.remark}</div>}
                         </div>
                       )
                     };

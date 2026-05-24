@@ -9,8 +9,8 @@ import './style.css';
 
 import React, { useState, useCallback } from 'react';
 import AdminLayout from '../../components/AdminLayout';
-import { Card, Table, Tag, Button, Breadcrumb, Space, Modal, Input, Select, message, Tooltip, Descriptions, Row, Col, Divider, Image } from 'antd';
-import { SettingOutlined, EyeOutlined, SearchOutlined, CheckCircleOutlined, CloseCircleOutlined, SafetyCertificateOutlined, FileTextOutlined, InboxOutlined, UploadOutlined, FilePdfOutlined, FileImageOutlined, ZoomInOutlined } from '@ant-design/icons';
+import { Card, Table, Tag, Button, Breadcrumb, Space, Modal, Input, Select, message, Tooltip, Descriptions, Row, Col, Divider, Image, Timeline } from 'antd';
+import { SettingOutlined, EyeOutlined, SearchOutlined, CheckCircleOutlined, CloseCircleOutlined, SafetyCertificateOutlined, FileTextOutlined, InboxOutlined, UploadOutlined, FilePdfOutlined, FileImageOutlined, ZoomInOutlined, HistoryOutlined } from '@ant-design/icons';
 
 
 
@@ -39,54 +39,110 @@ var TABLE_DATA = [
     key: '1', id: 1, sn: 'UAV-BJ-2026-001', name: '作业一号机', model: 'DJI Mavic 3 Enterprise', type: '多旋翼无人机', weightClass: '轻型（1.5-25kg）', purpose: '航拍摄影', owner: '张伟', applyDate: '2026-04-22', status: 'pending',
     manufacturer: '深圳市大疆创新科技', serialNo: 'DM3E20260115001', purchaseDate: '2025-11-20',
     maxTakeoffWeight: '8.5', maxFlightAltitude: '120', maxEndurance: '45', maxRange: '15', maxSpeed: '82', gpsCapability: 'RTK高精度定位', specialFeatures: '全向避障系统、IP45防护等级',
-    rejectReason: ''
+    rejectReason: '',
+    history: [
+      { time: '2026-04-18 10:00:00', action: 'submit', operator: 'dk20260001', remark: '首次提交飞行器备案申请。' },
+      { time: '2026-04-19 14:00:00', action: 'reject', operator: '高级审核员', remark: '首次驳回原因：防撞雷达型号及检测合格证书图片反光模糊，请重新上传清晰的原件扫描件。' },
+      { 
+        time: '2026-04-20 09:30:00', 
+        action: 'resubmit', 
+        operator: 'dk20260001', 
+        remark: '第一次重新提交，补充了高清无反光的合格证书扫描件：',
+        details: [
+          { label: '合格证明文件', oldVal: '照片模糊反光', newVal: '高精度扫描版合格证书' }
+        ]
+      },
+      { time: '2026-04-21 16:30:00', action: 'reject', operator: '高级审核员', remark: '第二次驳回原因：序列号与合格证中登记的 SN 序列号末尾两位数字不匹配，请仔细校对并重新填写。' },
+      { 
+        time: '2026-04-22 09:30:00', 
+        action: 'resubmit', 
+        operator: 'dk20260001', 
+        remark: '第二次重新提交，重新校对并修正了序列号信息：',
+        details: [
+          { label: '序列号/SN码', oldVal: 'DM3E20260115088', newVal: 'DM3E20260115001' }
+        ]
+      }
+    ]
   },
   {
     key: '2', id: 2, sn: 'UAV-BJ-2026-002', name: '植保二号机', model: '大疆 T50 农业无人机', type: '多旋翼无人机', weightClass: '小型（25-150kg）', purpose: '农林植保', owner: 'XX农业科技有限公司', applyDate: '2026-04-20', status: 'pending',
     manufacturer: '深圳市大疆创新科技', serialNo: 'DJT50202603200001', purchaseDate: '2026-01-10',
     maxTakeoffWeight: '92', maxFlightAltitude: '30', maxEndurance: '20', maxRange: '5', maxSpeed: '45', gpsCapability: '双频GPS+北斗', specialFeatures: 'RTK厘米级定位、仿地飞行',
-    rejectReason: ''
+    rejectReason: '',
+    history: [
+      { time: '2026-04-20 09:00:00', action: 'submit', operator: 'XX农业科技有限公司', remark: '提交植保二号机（大载重机型）的运营资质与备案登记材料。' }
+    ]
   },
   {
     key: '3', id: 3, sn: 'UAV-BJ-2026-003', name: '巡检三号机', model: '纵横 CW-25', type: '固定翼无人机', weightClass: '轻型（1.5-25kg）', purpose: '巡检巡查', owner: 'XX测绘工程有限公司', applyDate: '2026-04-18', status: 'approved',
     manufacturer: '成都纵横自动化技术', serialNo: 'ZHCW25202602150001', purchaseDate: '2026-02-15',
     maxTakeoffWeight: '18', maxFlightAltitude: '300', maxEndurance: '180', maxRange: '50', maxSpeed: '90', gpsCapability: 'RTK高精度定位', specialFeatures: '垂直起降、长续航',
-    rejectReason: ''
+    rejectReason: '',
+    history: [
+      { time: '2026-04-16 11:20:00', action: 'submit', operator: 'XX测绘工程有限公司', remark: '提交中空长航时固定翼巡检机备案申请。' },
+      { time: '2026-04-18 14:10:00', action: 'approve', operator: '高级审核员', remark: '经人工复核，合格证书真实，设备类型与民航局实名登记匹配一致。' }
+    ]
   },
   {
     key: '4', id: 4, sn: 'UAV-BJ-2026-004', name: '载客试飞机', model: '亿航 EH216-S', type: '垂直起降固定翼(eVTOL)', weightClass: '中型（150-5700kg）', purpose: '物流配送', owner: 'XX通航公司', applyDate: '2026-04-25', status: 'pending',
     manufacturer: '广州亿航智能', serialNo: 'EHEH216S20260301001', purchaseDate: '2026-03-01',
     maxTakeoffWeight: '620', maxFlightAltitude: '300', maxEndurance: '30', maxRange: '35', maxSpeed: '130', gpsCapability: 'RTK高精度定位', specialFeatures: '载人级、全备份安全系统',
-    rejectReason: ''
+    rejectReason: '',
+    history: [
+      { time: '2026-04-25 14:00:00', action: 'submit', operator: 'XX通航公司', remark: '首次提交载客级别电动垂直起降飞行器（eVTOL）空管备案登记申请。' }
+    ]
   },
   {
     key: '5', id: 5, sn: 'UAV-BJ-2026-005', name: '航拍五号机', model: '道通 EVO Lite+', type: '多旋翼无人机', weightClass: '微型（<1.5kg）', purpose: '航拍摄影', owner: '李明', applyDate: '2026-04-10', status: 'rejected',
     manufacturer: '深圳道通智能航空', serialNo: 'ATEL20260305001', purchaseDate: '2026-03-05',
     maxTakeoffWeight: '0.84', maxFlightAltitude: '120', maxEndurance: '40', maxRange: '10', maxSpeed: '68', gpsCapability: '双频GPS+北斗', specialFeatures: '',
-    rejectReason: '序列号与购买凭证信息不一致，请核实后重新提交'
+    rejectReason: '序列号与购买凭证信息不一致，请核实后重新提交',
+    history: [
+      { time: '2026-04-08 09:00:00', action: 'submit', operator: '李明', remark: '首次提交个人自用航拍微型机备案申请。' },
+      { time: '2026-04-10 16:20:00', action: 'reject', operator: '高级审核员', remark: '序列号与购买凭证信息不一致，请核实后重新提交。' }
+    ]
   }
 ];
 
 var Component = function AdminAircraftPage() {
+  var [tableData, setTableData] = useState(TABLE_DATA);
   var [viewOpen, setViewOpen] = useState(false);
   var [rejectOpen, setRejectOpen] = useState(false);
   var [rejectReason, setRejectReason] = useState('');
-  var [currentRecord, setCurrentRecord] = useState<typeof TABLE_DATA[0] | null>(null);
+  var [currentRecord, setCurrentRecord] = useState<any>(null);
 
   var handleNavigate = useCallback(function (key: string) {
     window.location.href = '/prototypes/' + key;
   }, []);
 
-  var handleView = function (record: typeof TABLE_DATA[0]) {
+  var handleView = function (record: any) {
     setCurrentRecord(record);
     setViewOpen(true);
   };
 
-  var handleApprove = function (record: typeof TABLE_DATA[0]) {
+  var handleApprove = function (record: any) {
+    var auditTime = '2026-05-22 09:50:00';
+    setTableData(function (prev) {
+      return prev.map(function (item) {
+        if (item.key === record.key) {
+          var history = item.history ? [].concat(item.history) : [];
+          history.push({
+            time: auditTime,
+            action: 'approve',
+            operator: '当前管理员',
+            remark: '人工运营审核通过，技术参数与实体证明材料核验无误。'
+          });
+          var updated = Object.assign({}, item, { status: 'approved', history: history });
+          setCurrentRecord(updated);
+          return updated;
+        }
+        return item;
+      });
+    });
     message.success('飞行器 ' + record.sn + ' 审批通过');
   };
 
-  var handleRejectClick = function (record: typeof TABLE_DATA[0]) {
+  var handleRejectClick = function (record: any) {
     setCurrentRecord(record);
     setRejectReason('');
     setRejectOpen(true);
@@ -96,6 +152,30 @@ var Component = function AdminAircraftPage() {
     if (!rejectReason.trim()) {
       message.warning('请填写驳回原因');
       return;
+    }
+    if (currentRecord) {
+      var auditTime = '2026-05-22 09:50:00';
+      setTableData(function (prev) {
+        return prev.map(function (item) {
+          if (item.key === currentRecord.key) {
+            var history = item.history ? [].concat(item.history) : [];
+            history.push({
+              time: auditTime,
+              action: 'reject',
+              operator: '当前管理员',
+              remark: rejectReason
+            });
+            var updated = Object.assign({}, item, {
+              status: 'rejected',
+              rejectReason: rejectReason,
+              history: history
+            });
+            setCurrentRecord(updated);
+            return updated;
+          }
+          return item;
+        });
+      });
     }
     message.success('已驳回飞行器 ' + (currentRecord?.sn || ''));
     setRejectOpen(false);
@@ -140,7 +220,7 @@ var Component = function AdminAircraftPage() {
             <Button type="primary" icon={<SearchOutlined />}>查询</Button>
             <Button>重置</Button>
           </div>
-          <Table columns={columns} dataSource={TABLE_DATA} pagination={{ pageSize: 10 }} scroll={{ x: 1500 }} />
+          <Table columns={columns} dataSource={tableData} pagination={{ pageSize: 10 }} scroll={{ x: 1500 }} />
         </Card>
       </div>
 
@@ -245,12 +325,52 @@ var Component = function AdminAircraftPage() {
               </Col>
             </Row>
 
-            {currentRecord.status === 'rejected' && currentRecord.rejectReason && (
+            {currentRecord.history && currentRecord.history.length > 0 && (
               <>
                 <Divider />
-                <div style={{ background: '#fff2f0', border: '1px solid #ffccc7', borderRadius: 8, padding: 16 }}>
-                  <div style={{ color: '#cf1322', fontWeight: 600, marginBottom: 4 }}>驳回原因</div>
-                  <div style={{ color: '#595959' }}>{currentRecord.rejectReason}</div>
+                <div style={{ marginTop: 24, padding: 16, background: '#f5f7fa', border: '1px solid #e4e7ed', borderRadius: 8 }}>
+                  <div style={{ fontWeight: 600, color: '#002c8c', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 6, fontSize: 14 }}>
+                    <HistoryOutlined /> 历史审批与重新提交记录
+                  </div>
+                  <Timeline
+                    style={{ marginTop: 8 }}
+                    items={currentRecord.history.map(function (hist: any, idx: number) {
+                      var color = hist.action === 'approve' ? 'green' : hist.action === 'reject' ? 'red' : hist.action === 'submit' ? 'blue' : 'orange';
+                      
+                      var submitTotalIndex = currentRecord.history.slice(0, idx + 1).filter(function (h: any) {
+                        return h.action === 'submit' || h.action === 'resubmit';
+                      }).length;
+                      
+                      var isResubmit = hist.action === 'resubmit';
+                      
+                      var label = hist.action === 'approve'
+                        ? '审批通过'
+                        : hist.action === 'reject'
+                          ? '审批驳回'
+                          : hist.action === 'submit'
+                            ? '首次提交'
+                            : ('第' + submitTotalIndex + '次提交');
+                      
+                      var showRemark = hist.remark && !isResubmit;
+                      
+                      return {
+                        color: color,
+                        children: (
+                          <div style={{ paddingBottom: 2 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 500, fontSize: 13 }}>
+                              <span>{label} <span style={{ color: '#8c8c8c', fontWeight: 'normal', fontSize: 12 }}>({hist.operator})</span></span>
+                              <span style={{ color: '#8c8c8c', fontWeight: 'normal', fontSize: 12 }}>{hist.time}</span>
+                            </div>
+                            {showRemark && (
+                              <div style={{ color: '#595959', marginTop: 4, fontSize: 12, background: '#ffffff', padding: '8px 12px', borderRadius: 6, border: '1px dashed #e8e8e8' }}>
+                                <div style={{ fontWeight: 500 }}>{hist.remark}</div>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      };
+                    })}
+                  />
                 </div>
               </>
             )}

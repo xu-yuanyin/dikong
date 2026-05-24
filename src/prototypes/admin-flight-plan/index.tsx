@@ -9,8 +9,8 @@ import './style.css';
 
 import React, { useState, useCallback } from 'react';
 import AdminLayout from '../../components/AdminLayout';
-import { Card, Table, Tag, Button, Breadcrumb, Space, Modal, Input, Select, message, Tooltip, Descriptions, Divider } from 'antd';
-import { SettingOutlined, EyeOutlined, SearchOutlined, CheckCircleOutlined, CloseCircleOutlined, FileTextOutlined, ClockCircleOutlined, SafetyCertificateOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { Card, Table, Tag, Button, Breadcrumb, Space, Modal, Input, Select, message, Tooltip, Descriptions, Divider, Timeline } from 'antd';
+import { SettingOutlined, EyeOutlined, SearchOutlined, CheckCircleOutlined, CloseCircleOutlined, FileTextOutlined, ClockCircleOutlined, SafetyCertificateOutlined, EnvironmentOutlined, HistoryOutlined } from '@ant-design/icons';
 
 
 
@@ -37,58 +37,105 @@ var TABLE_DATA = [
     pilotLicense: 'UAV-L-2026-0088', pilotPhone: '138****5678', organization: 'XX测绘工程有限公司', emergencyContact: 'dk20260009（138****1234）', flightPurpose: '城东片区电力线路定期巡检，航拍数据采集与分析，确保线路安全运行',
     startTime: '08:00', endTime: '12:00', altitudeMin: '30', altitudeMax: '120', takeoffPoint: '城东起降场A区', landingPoint: '城东起降场A区', flightRoute: '城东起降场→沿电力线路→东区巡检航线→返回起降场',
     insuranceStatus: '是', insuranceInfo: '中国人保 UAV-INS-2026-0088', safetyMeasures: '配备实时监控地面站、备用飞行器、紧急降落预案', riskControl: '如遇突发天气变化立即返航，备用降落点：城东公园广场', backupComm: '对讲机 433.125MHz', weatherCondition: '风速≤5级、能见度≥3km、无降水、无雷电活动', remarks: '',
-    rejectReason: ''
+    rejectReason: '',
+    history: [
+      { time: '2026-04-20 10:00:00', action: 'submit', operator: 'XX测绘工程有限公司', remark: '提交城东测绘巡检飞行计划申请。' },
+      { time: '2026-04-22 14:00:00', action: 'reject', operator: '高级空管员', remark: '首次驳回原因：航线图未标注临时起降点，高度超限（部分区域超出120m限高，请修改高度区间）。' },
+      { 
+        time: '2026-04-24 09:30:00', 
+        action: 'resubmit', 
+        operator: 'XX测绘工程有限公司', 
+        remark: '第一次重新提交，补充了完整的航线说明，并将飞行高度控制在安全合规的120m以内：',
+        details: [
+          { label: '最高高度', oldVal: '150m', newVal: '120m' }
+        ]
+      }
+    ]
   },
   {
     key: '2', id: 2, planId: 'FP-BJ-2026-0199', name: '南区航拍摄影', flightType: '航拍测绘', aircraft: 'DJI Mavic 3E（UAV-BJ-2026-001）', airspace: '南区试飞区（0-500m）', date: '2026-04-27', timeRange: '09:00-11:30', pilot: '张伟', applicant: '张伟', status: 'pending',
     pilotLicense: 'UAV-L-2026-0001', pilotPhone: '139****1234', organization: '', emergencyContact: 'dk20260010（139****5678）', flightPurpose: '南区城市景观航拍，用于城市规划展示宣传片拍摄',
-    startTime: '09:00', endTime: '11:30', altitudeMin: '50', altitudeMax: '200', takeoffPoint: '南区市民广场', landingPoint: '南区市民广场', flightRoute: '市民广场→沿江景观带→南区公园→返回',
+    startTime: '09:00', endTime: '11:30', altitudeMin: '50', altitudeMax: '200', takeoffPoint: '市民广场', landingPoint: '市民广场', flightRoute: '市民广场→沿江景观带→南区公园→返回',
     insuranceStatus: '是', insuranceInfo: '平安保险 UAV-INS-2026-0001', safetyMeasures: '飞行前检查设备状态、保持视距内飞行、配备观察员', riskControl: '如信号丢失自动返航，备用降落点：南区体育场', backupComm: '手机 139****1234', weatherCondition: '风速≤4级、能见度≥5km、无降水', remarks: '',
-    rejectReason: ''
+    rejectReason: '',
+    history: [
+      { time: '2026-04-27 09:00:00', action: 'submit', operator: '张伟', remark: '首次提交南区航拍摄影计划。' }
+    ]
   },
   {
     key: '3', id: 3, planId: 'FP-BJ-2026-0195', name: '物流配送测试', flightType: '物流配送', aircraft: '亿航 EH216-S（UAV-BJ-2026-004）', airspace: '城东物流走廊（50-200m）', date: '2026-04-25', timeRange: '10:00-16:00', pilot: '王芳', applicant: 'XX通航公司', status: 'approved',
     pilotLicense: 'UAV-L-2026-0055', pilotPhone: '137****9012', organization: 'XX通航公司', emergencyContact: 'dk20260008（137****9012）', flightPurpose: '城东至城西物流配送航线测试，验证eVTOL载货飞行可行性',
     startTime: '10:00', endTime: '16:00', altitudeMin: '80', altitudeMax: '200', takeoffPoint: '城东物流中心起降坪', landingPoint: '城西配送站起降坪', flightRoute: '城东物流中心→城东物流走廊→城西配送站',
     insuranceStatus: '是', insuranceInfo: '太平洋保险 UAV-INS-2026-0055', safetyMeasures: '全程远程监控、双机备份、地面保障团队随行', riskControl: '紧急降落点：沿线3个应急停机坪', backupComm: '对讲机 433.200MHz + 卫星电话', weatherCondition: '风速≤3级、能见度≥5km、无降水、无雷电活动、云底高度≥300m', remarks: '首次载人级eVTOL物流测试飞行',
-    rejectReason: ''
+    rejectReason: '',
+    history: [
+      { time: '2026-04-24 10:00:00', action: 'submit', operator: 'XX通航公司', remark: '首次提交eVTOL物流配送路线飞行申请。' },
+      { time: '2026-04-25 11:30:00', action: 'approve', operator: '高级空管员', remark: '多机备份与应急准备措施充足，航线无空中冲突，同意通过。' }
+    ]
   },
   {
     key: '4', id: 4, planId: 'FP-BJ-2026-0188', name: '电力线路巡检', flightType: '巡检飞行', aircraft: '纵横 CW-25（UAV-BJ-2026-003）', airspace: '西区巡检航线（30-120m）', date: '2026-04-22', timeRange: '14:00-17:00', pilot: '李明', applicant: 'XX测绘工程有限公司', status: 'approved',
     pilotLicense: 'UAV-L-2026-0088', pilotPhone: '138****5678', organization: 'XX测绘工程有限公司', emergencyContact: 'dk20260009（138****1234）', flightPurpose: '西区高压输电线路红外巡检，排查线路隐患',
     startTime: '14:00', endTime: '17:00', altitudeMin: '30', altitudeMax: '80', takeoffPoint: '西区变电站', landingPoint: '西区变电站', flightRoute: '西区变电站→沿高压线路→巡检终点→返回',
     insuranceStatus: '是', insuranceInfo: '中国人保 UAV-INS-2026-0088', safetyMeasures: '配备红外热成像设备、实时数据回传、地面站监控', riskControl: '紧急降落点：沿线变电站空地', backupComm: '对讲机 433.125MHz', weatherCondition: '风速≤5级、能见度≥3km', remarks: '',
-    rejectReason: ''
+    rejectReason: '',
+    history: [
+      { time: '2026-04-21 14:00:00', action: 'submit', operator: 'XX测绘工程有限公司', remark: '首次提交高压巡检计划申请。' },
+      { time: '2026-04-22 16:00:00', action: 'approve', operator: '系统自动核查', remark: '资质与报备数据验证通过。' }
+    ]
   },
   {
     key: '5', id: 5, planId: 'FP-BJ-2026-0180', name: '应急救援演练', flightType: '应急救援', aircraft: 'DJI M350 RTK（UAV-BJ-2026-006）', airspace: '城北训练区（0-300m）', date: '2026-04-20', timeRange: '08:00-15:00', pilot: '赵刚', applicant: '市应急管理局', status: 'rejected',
     pilotLicense: 'UAV-L-2026-0020', pilotPhone: '136****3456', organization: '市应急管理局', emergencyContact: 'dk20260011（136****3456）', flightPurpose: '城北区域应急救援演练，模拟山区搜救场景',
     startTime: '08:00', endTime: '15:00', altitudeMin: '50', altitudeMax: '300', takeoffPoint: '城北训练基地', landingPoint: '城北训练基地', flightRoute: '训练基地→模拟搜救区域→物资投送点→返回',
     insuranceStatus: '办理中', insuranceInfo: '', safetyMeasures: '配备搜救设备、热成像仪、喊话器', riskControl: '紧急降落点：训练基地备用场地', backupComm: '对讲机 433.300MHz', weatherCondition: '风速≤4级、能见度≥3km', remarks: '年度应急演练计划',
-    rejectReason: '保险尚未办理完成，请补充保险凭证后重新提交'
+    rejectReason: '保险尚未办理完成，请补充保险凭证后重新提交',
+    history: [
+      { time: '2026-04-19 08:00:00', action: 'submit', operator: '市应急管理局', remark: '提交应急搜救演练飞行申请。' },
+      { time: '2026-04-20 15:00:00', action: 'reject', operator: '高级空管员', remark: '保险尚未办理完成，请补充保险凭证后重新提交。' }
+    ]
   }
 ];
 
 var Component = function AdminFlightPlanPage() {
+  var [tableData, setTableData] = useState(TABLE_DATA);
   var [viewOpen, setViewOpen] = useState(false);
   var [rejectOpen, setRejectOpen] = useState(false);
   var [rejectReason, setRejectReason] = useState('');
-  var [currentRecord, setCurrentRecord] = useState<typeof TABLE_DATA[0] | null>(null);
+  var [currentRecord, setCurrentRecord] = useState<any>(null);
 
   var handleNavigate = useCallback(function (key: string) {
     window.location.href = '/prototypes/' + key;
   }, []);
 
-  var handleView = function (record: typeof TABLE_DATA[0]) {
+  var handleView = function (record: any) {
     setCurrentRecord(record);
     setViewOpen(true);
   };
 
-  var handleApprove = function (record: typeof TABLE_DATA[0]) {
+  var handleApprove = function (record: any) {
+    var auditTime = '2026-05-22 09:50:00';
+    setTableData(function (prev) {
+      return prev.map(function (item) {
+        if (item.key === record.key) {
+          var history = item.history ? [].concat(item.history) : [];
+          history.push({
+            time: auditTime,
+            action: 'approve',
+            operator: '当前管理员',
+            remark: '飞行计划参数符合空域使用规范，予以审批通过。'
+          });
+          var updated = Object.assign({}, item, { status: 'approved', history: history });
+          setCurrentRecord(updated);
+          return updated;
+        }
+        return item;
+      });
+    });
     message.success('飞行计划 ' + record.planId + ' 审批通过');
   };
 
-  var handleRejectClick = function (record: typeof TABLE_DATA[0]) {
+  var handleRejectClick = function (record: any) {
     setCurrentRecord(record);
     setRejectReason('');
     setRejectOpen(true);
@@ -98,6 +145,30 @@ var Component = function AdminFlightPlanPage() {
     if (!rejectReason.trim()) {
       message.warning('请填写驳回原因');
       return;
+    }
+    if (currentRecord) {
+      var auditTime = '2026-05-22 09:50:00';
+      setTableData(function (prev) {
+        return prev.map(function (item) {
+          if (item.key === currentRecord.key) {
+            var history = item.history ? [].concat(item.history) : [];
+            history.push({
+              time: auditTime,
+              action: 'reject',
+              operator: '当前管理员',
+              remark: rejectReason
+            });
+            var updated = Object.assign({}, item, {
+              status: 'rejected',
+              rejectReason: rejectReason,
+              history: history
+            });
+            setCurrentRecord(updated);
+            return updated;
+          }
+          return item;
+        });
+      });
     }
     message.success('已驳回飞行计划 ' + (currentRecord?.planId || ''));
     setRejectOpen(false);
@@ -139,7 +210,7 @@ var Component = function AdminFlightPlanPage() {
             <Button type="primary" icon={<SearchOutlined />}>查询</Button>
             <Button>重置</Button>
           </div>
-          <Table columns={columns} dataSource={TABLE_DATA} pagination={{ pageSize: 10 }} scroll={{ x: 1600 }} />
+          <Table columns={columns} dataSource={tableData} pagination={{ pageSize: 10 }} scroll={{ x: 1600 }} />
         </Card>
       </div>
 
@@ -200,12 +271,52 @@ var Component = function AdminFlightPlanPage() {
               <Descriptions.Item label="审批状态"><Tag color={STATUS_MAP[currentRecord.status].color}>{STATUS_MAP[currentRecord.status].text}</Tag></Descriptions.Item>
             </Descriptions>
 
-            {currentRecord.status === 'rejected' && currentRecord.rejectReason && (
+            {currentRecord.history && currentRecord.history.length > 0 && (
               <>
                 <Divider />
-                <div style={{ background: '#fff2f0', border: '1px solid #ffccc7', borderRadius: 8, padding: 16 }}>
-                  <div style={{ color: '#cf1322', fontWeight: 600, marginBottom: 4 }}>驳回原因</div>
-                  <div style={{ color: '#595959' }}>{currentRecord.rejectReason}</div>
+                <div style={{ marginTop: 24, padding: 16, background: '#f5f7fa', border: '1px solid #e4e7ed', borderRadius: 8 }}>
+                  <div style={{ fontWeight: 600, color: '#002c8c', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 6, fontSize: 14 }}>
+                    <HistoryOutlined /> 历史审批与重新提交记录
+                  </div>
+                  <Timeline
+                    style={{ marginTop: 8 }}
+                    items={currentRecord.history.map(function (hist: any, idx: number) {
+                      var color = hist.action === 'approve' ? 'green' : hist.action === 'reject' ? 'red' : hist.action === 'submit' ? 'blue' : 'orange';
+                      
+                      var submitTotalIndex = currentRecord.history.slice(0, idx + 1).filter(function (h: any) {
+                        return h.action === 'submit' || h.action === 'resubmit';
+                      }).length;
+                      
+                      var isResubmit = hist.action === 'resubmit';
+                      
+                      var label = hist.action === 'approve'
+                        ? '审批通过'
+                        : hist.action === 'reject'
+                          ? '审批驳回'
+                          : hist.action === 'submit'
+                            ? '首次提交'
+                            : ('第' + submitTotalIndex + '次提交');
+                      
+                      var showRemark = hist.remark && !isResubmit;
+                      
+                      return {
+                        color: color,
+                        children: (
+                          <div style={{ paddingBottom: 2 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 500, fontSize: 13 }}>
+                              <span>{label} <span style={{ color: '#8c8c8c', fontWeight: 'normal', fontSize: 12 }}>({hist.operator})</span></span>
+                              <span style={{ color: '#8c8c8c', fontWeight: 'normal', fontSize: 12 }}>{hist.time}</span>
+                            </div>
+                            {showRemark && (
+                              <div style={{ color: '#595959', marginTop: 4, fontSize: 12, background: '#ffffff', padding: '8px 12px', borderRadius: 6, border: '1px dashed #e8e8e8' }}>
+                                <div style={{ fontWeight: 500 }}>{hist.remark}</div>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      };
+                    })}
+                  />
                 </div>
               </>
             )}
